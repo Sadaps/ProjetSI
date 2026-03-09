@@ -1,0 +1,42 @@
+services:
+  # --- LA BASE DE DONNÉES (PostgreSQL) ---
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: symfony_user
+      POSTGRES_PASSWORD: symfony_password
+      POSTGRES_DB: symfony_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # --- LE BACKEND (Symfony + PHP) ---
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://symfony_user:symfony_password@database:5432/symfony_db?serverVersion=16&charset=utf8
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - database
+
+  # --- LE FRONTEND (Angular + Node.js) ---
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  db_data: 
