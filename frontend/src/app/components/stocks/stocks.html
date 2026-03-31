@@ -1,0 +1,30 @@
+<div class="stocks-container">
+  <h2>Gestion des Stocks</h2>
+
+  <div *ngIf="produits.length === 0" class="loading">
+    <p>⏳ Chargement des produits en cours...</p>
+  </div>
+
+  <table *ngIf="produits.length > 0" class="stock-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom du produit</th>
+        <th>Nom Scientifique</th>
+        <th>Fonction</th>
+        <th>Cosmos</th>
+        <th>Lots associés</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let produit of produits">
+        <td>{{ produit.id }}</td>
+        <td><strong>{{ produit.nom }}</strong></td>
+        <td>{{ produit.nomScientifique }}</td>
+        <td>{{ produit.fonction || 'Non défini' }}</td>
+        <td>{{ produit.cosmos || '-' }}</td>
+        <td> Lot ya pas encore au moment où je le fais</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

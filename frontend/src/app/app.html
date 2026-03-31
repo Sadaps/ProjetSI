@@ -5,10 +5,11 @@
       <small>Gestion industrielle</small>
     </div>
     <ul class="nav-links">
-      <li class="active">Tableau de bord</li>
-      <li>Gestion des stocks</li>
-      <li>Réception</li>
-      <li>Fournisseurs</li>
+      <li class="active"><a routerLink="/tableaubord">Tableau de bord</a></li>
+      <li><a routerLink="/stocks">Gestion des stocks</a></li>
+      <li><a routerLink="/reception">Réception</a></li>
+      <li><a routerLink="/fournisseurs">Fournisseurs</a></li>
+      <li><a routerLink="/commandes">Commandes</a></li>
     </ul>
   </nav>
 
@@ -18,28 +19,7 @@
       <div class="user-info">🔔 Jean Dupont</div>
     </header>
 
-    <section class="dashboard-body">
-      <h1>Tableau de bord</h1>
-      <p>Vue d'ensemble de votre stock industriel</p>
-
-      <div class="stats-grid">
-        <div class="card blue">
-          <small>Total Produits</small>
-          <div class="value">{{ produits.length }}</div>
-        </div>
-        <div class="card orange">
-          <small>Stocks Bas</small>
-          <div class="value">3</div> </div>
-        <div class="card yellow">
-          <small>Péremptions Proches</small>
-          <div class="value">2</div>
-        </div>
-        <div class="card red">
-          <small>Lots Périmés</small>
-          <div class="value">0</div>
-        </div>
-      </div>
-      
-      </section>
+     <router-outlet></router-outlet>
+    
   </main>
 </div>
