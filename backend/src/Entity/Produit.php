@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['produit:read', 'contenir:read']]
+)]
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 class Produit
 {
@@ -41,7 +43,6 @@ class Produit
      * @var Collection<int, FournisPar>
      */
     #[ORM\OneToMany(targetEntity: FournisPar::class, mappedBy: 'produit')]
-    #[Groups(['produit:read'])]
     private Collection $fournisPar;
 
     /**
@@ -55,7 +56,6 @@ class Produit
      * @var Collection<int, Contenir>
      */
     #[ORM\OneToMany(targetEntity: Contenir::class, mappedBy: 'produit')]
-    #[Groups(['produit:read'])]
     private Collection $contenir;
 
     public function __construct()
@@ -208,12 +208,4 @@ class Produit
         return $this;
     }
 
-    public function getQuantiteTotale(): int
-    {
-        $total = 0;
-        foreach ($this->lots as $lot) {
-            $total += $lot->getQuantite();
-        }
-        return $total;
-    }
 }

@@ -15,7 +15,6 @@
         <th>Cosmos</th>
         <th>Stock Total</th>
         <th>Statut</th>
-        <th>Lots associés</th>
       </tr>
     </thead>
     <tbody>
@@ -27,25 +26,21 @@
           <td>{{ produit.nomScientifique }}</td>
           <td>{{ produit.fonction || 'Non défini' }}</td>
           <td>{{ produit.cosmos || '-' }}</td>
-          <td>{{ produit.quantiteTotale }}</td>
+          
+          <td>{{ produit.quantiteTotale || 0 }}</td>
+          
           <td>
             <span *ngIf="(produit.quantiteTotale || 0) > 0" class="status-in">
               ✅ En stock
             </span>
-            
             <span *ngIf="(produit.quantiteTotale || 0) <= 0" class="status-out">
               ❌ Hors stock
             </span>
           </td>
-          <td>
-            <button>
-              {{ produit.isExpanded ? 'Cacher les lots' : 'Voir les lots' }}
-            </button>
-          </td>
         </tr>
 
         <tr *ngIf="produit.isExpanded" class="lots-row">
-          <td colspan="6" class="lots-cell">
+          <td colspan="8" class="lots-cell">
             
             <div *ngIf="produit.lots && produit.lots.length > 0; else noLots" class="inner-table-container">
               <table class="lots-table">
