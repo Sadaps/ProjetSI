@@ -9,10 +9,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['produit:read']]
+)]
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 class Produit
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

@@ -2,25 +2,30 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\InventaireRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Serializer\Annotation\Groups;
+#[ApiResource] // Ajouté
 #[ORM\Entity(repositoryClass: InventaireRepository::class)]
 class Inventaire
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['produit:read'])] // Ajouté
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(['produit:read'])] // Ajouté
     private ?\DateTime $dateInv = null;
 
     /**
      * @var Collection<int, VerifierLot>
+     * On ne met PAS de Groups ici pour éviter de repartir vers VerifierLot
      */
     #[ORM\OneToMany(targetEntity: VerifierLot::class, mappedBy: 'inventaire')]
     private Collection $verifierLot;

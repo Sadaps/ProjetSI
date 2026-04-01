@@ -2,66 +2,43 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ContenirRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource]
 #[ORM\Entity(repositoryClass: ContenirRepository::class)]
 class Contenir
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['produit:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['produit:read'])]
     private ?int $quantite = null;
 
     #[ORM\ManyToOne(inversedBy: 'contenir')]
     #[ORM\JoinColumn(nullable: false)]
+    // SURTOUT PAS de Groups ici (sinon on repart vers Commande -> boucle)
     private ?Commande $commande = null;
 
     #[ORM\ManyToOne(inversedBy: 'contenir')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['produit:read'])] // Utile pour voir quel produit est dans la commande
     private ?Produit $produit = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function getQuantite(): ?int
-    {
-        return $this->quantite;
-    }
+    public function getQuantite(): ?int { return $this->quantite; }
+    public function setQuantite(int $quantite): static { $this->quantite = $quantite; return $this; }
 
-    public function setQuantite(int $quantite): static
-    {
-        $this->quantite = $quantite;
+    public function getCommande(): ?Commande { return $this->commande; }
+    public function setCommande(?Commande $commande): static { $this->commande = $commande; return $this; }
 
-        return $this;
-    }
-
-    public function getCommande(): ?Commande
-    {
-        return $this->commande;
-    }
-
-    public function setCommande(?Commande $commande): static
-    {
-        $this->commande = $commande;
-
-        return $this;
-    }
-
-    public function getProduit(): ?Produit
-    {
-        return $this->produit;
-    }
-
-    public function setProduit(?Produit $produit): static
-    {
-        $this->produit = $produit;
-
-        return $this;
-    }
+    public function getProduit(): ?Produit { return $this->produit; }
+    public function setProduit(?Produit $produit): static { $this->produit = $produit; return $this; }
 }
