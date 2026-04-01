@@ -1,1 +1,76 @@
-<p>reception works!</p>
+<div class="page-header">
+  <h2>Réception de Commande</h2>
+  <p>Valider la réception et générer les lots</p>
+</div>
+
+<div class="card form-card">
+  <h3>Informations de la commande</h3>
+  
+<div class="form-group">
+  <label>Sélectionner la commande reçue <span class="text-red">*</span></label>
+  <select [(ngModel)]="selectedCommande" (change)="onCommandeChange()" class="form-control">
+    <option [ngValue]="null">-- Choisissez une commande --</option>
+    
+    <option *ngFor="let cmd of commandesEnAttente" [ngValue]="cmd">
+      Commande n°{{ cmd.id }} - {{ cmd.date_commande | date:'dd/MM/yyyy' }}
+    </option>
+  </select>
+</div>
+
+    <div class="form-group flex-1">
+      <label>Date de réception <span class="text-red">*</span></label>
+      <input type="date" [(ngModel)]="dateReception">
+    </div>
+  </div>
+
+  <div class="cmd-details-box" *ngIf="selectedCommande">
+    <div>
+      <small>Fournisseur</small>
+      <strong>{{ selectedCommande?.fournisseur?.nom }}</strong>
+    </div>
+    <div>
+      <small>Date de commande</small>
+      <strong>{{ selectedCommande.date_commande | date:'dd/MM/yyyy' }}</strong>
+    </div>
+    <div>
+      <small>Montant total</small>
+      <strong>{{ selectedCommande.prix }}</strong>
+    </div>
+  </div>
+
+  <div class="form-group mt-15">
+    <label>Notes et observations</label>
+    <textarea [(ngModel)]="notes" rows="4" placeholder="Ajouter des notes concernant la réception..."></textarea>
+  </div>
+
+<div class="card form-card mt-20" *ngIf="selectedCommande">
+  <h3>Détails des lots reçus</h3>
+  
+  <div *ngFor="let ligne of lignesLots; let i = index" class="lot-row">
+    <div class="lot-info-produit">
+      <strong>{{ ligne.nomProduit }}</strong>
+      <small>{{ ligne.nomScientifique }}</small>
+      <span class="badge">Prévu : {{ ligne.quantitePrevue }} unités</span>
+    </div>
+
+    <div class="lot-inputs-grid">
+      <div class="form-group">
+        <label>N° Lot <span class="text-red">*</span></label>
+        <input type="text" [(ngModel)]="ligne.numeroLot" placeholder="Ex: LOT-2026-{{i}}">
+      </div>
+      <div class="form-group">
+        <label>Poids (kg)</label>
+        <input type="number" [(ngModel)]="ligne.poidsReel">
+      </div>
+      <div class="form-group">
+        <label>Péremption <span class="text-red">*</span></label>
+        <input type="date" [(ngModel)]="ligne.datePeremption">
+      </div>
+    </div>
+    <hr *ngIf="i < lignesLots.length - 1">
+  </div>
+
+  <div class="form-actions">
+    <button class="btn-primary" (click)="validerReception()">✓ Valider la réception</button>
+  </div>
+</div>

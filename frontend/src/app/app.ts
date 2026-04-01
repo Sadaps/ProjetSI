@@ -1,7 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // <-- 1. Ajout de ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink} from '@angular/router';
-
 @Component({
   selector: 'app-root',
   standalone: true,

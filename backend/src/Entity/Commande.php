@@ -8,24 +8,24 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource]
+#[ApiResource(normalizationContext: ['groups' => ['commande:read']])]
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 class Commande
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['produit:read'])]
+    #[Groups(['commande:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['produit:read'])]
+    #[Groups(['commande:read'])]
     private ?\DateTime $date_commande = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2)]
-    #[Groups(['produit:read'])]
+    #[Groups(['commande:read'])]
     private ?string $prix = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
@@ -41,6 +41,7 @@ class Commande
      * @var Collection<int, Contenir>
      */
     #[ORM\OneToMany(targetEntity: Contenir::class, mappedBy: 'commande')]
+    #[Groups(['commande:read'])]
     private Collection $contenir; 
 
     /**
@@ -50,7 +51,7 @@ class Commande
     private Collection $recus;
 
     #[ORM\ManyToOne(inversedBy: 'commandes')]
-    #[Groups(['produit:read'])] 
+    #[Groups(['commande:read'])]
     private ?Fournisseur $fournisseur = null;
 
     public function __construct()
