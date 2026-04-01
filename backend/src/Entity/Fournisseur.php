@@ -7,20 +7,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
-<<<<<<< HEAD
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     normalizationContext: ['groups' => ['fournisseur:read', 'commande:read']]
 )]
-=======
-use Symfony\Component\Serializer\Attribute\Groups; 
-
->>>>>>> fournisseur-Thibaut
 #[ORM\Entity(repositoryClass: FournisseurRepository::class)]
-#[ApiResource(
-    normalizationContext: ['groups' => ['fournisseur:read']] 
-)]
 class Fournisseur
 {
     #[ORM\Id]
@@ -29,13 +21,8 @@ class Fournisseur
     #[Groups(['fournisseur:read'])] 
     private ?int $id = null;
 
-<<<<<<< HEAD
     #[ORM\Column(length: 50)]
     #[Groups(['fournisseur:read', 'commande:read'])]
-=======
-    #[ORM\Column(length: 255)]
-    #[Groups(['fournisseur:read'])] 
->>>>>>> fournisseur-Thibaut
     private ?string $nom = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -45,7 +32,6 @@ class Fournisseur
     #[ORM\Column(length: 50, nullable: true)]
     #[Groups(['fournisseur:read'])]
     private ?string $adresse = null;
-
 
     #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'fournisseur')]
     #[Groups(['fournisseur:read'])]
