@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\VerifierLotRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource]
 #[ORM\Entity(repositoryClass: VerifierLotRepository::class)]

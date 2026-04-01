@@ -8,9 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
-
+use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
-    normalizationContext: ['groups' => ['produit:read']]
+    normalizationContext: ['groups' => ['produit:read', 'contenir:read', 'commande:read']]
 )]
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 class Produit
@@ -19,18 +19,23 @@ class Produit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['produit:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['produit:read', 'contenir:read', 'commande:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['produit:read', 'contenir:read', 'commande:read'])]
     private ?string $nomScientifique = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['produit:read'])]
     private ?string $fonction = null;
 
     #[ORM\Column(length: 150, nullable: true)]
+    #[Groups(['produit:read'])]
     private ?string $cosmos = null;
 
     /**

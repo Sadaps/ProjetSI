@@ -5,20 +5,21 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ContenirRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
-
-#[ApiResource]
+use Symfony\Component\Serializer\Attribute\Groups;
+#[ApiResource(
+    normalizationContext: ['groups' => ['contenir:read', 'commande:read',]]
+)]
 #[ORM\Entity(repositoryClass: ContenirRepository::class)]
 class Contenir
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['produit:read'])]
+    #[Groups(['contenir:read', 'commande:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(['produit:read'])]
+    #[Groups(['contenir:read', 'commande:read'])]
     private ?int $quantite = null;
 
     #[ORM\ManyToOne(inversedBy: 'contenir')]
@@ -28,7 +29,7 @@ class Contenir
 
     #[ORM\ManyToOne(inversedBy: 'contenir')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['produit:read'])] // Utile pour voir quel produit est dans la commande
+#[Groups(['contenir:read', 'commande:read'])]
     private ?Produit $produit = null;
 
     public function getId(): ?int { return $this->id; }
