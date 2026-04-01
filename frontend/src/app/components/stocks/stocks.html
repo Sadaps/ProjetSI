@@ -13,18 +13,71 @@
         <th>Nom Scientifique</th>
         <th>Fonction</th>
         <th>Cosmos</th>
+        <th>Stock Total</th>
+        <th>Statut</th>
         <th>Lots associés</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let produit of produits">
-        <td>{{ produit.id }}</td>
-        <td><strong>{{ produit.nom }}</strong></td>
-        <td>{{ produit.nomScientifique }}</td>
-        <td>{{ produit.fonction || 'Non défini' }}</td>
-        <td>{{ produit.cosmos || '-' }}</td>
-        <td> Lot ya pas encore au moment où je le fais</td>
-      </tr>
+      <ng-container *ngFor="let produit of produits">
+        
+        <tr (click)="toggleLots(produit)" class="produit-row" style="cursor: pointer;">
+          <td>{{ produit.id }}</td>
+          <td><strong>{{ produit.nom }}</strong></td>
+          <td>{{ produit.nomScientifique }}</td>
+          <td>{{ produit.fonction || 'Non défini' }}</td>
+          <td>{{ produit.cosmos || '-' }}</td>
+          <td>{{ produit.quantiteTotale }}</td>
+          <td>
+            <span *ngIf="(produit.quantiteTotale || 0) > 0" class="status-in">
+              ✅ En stock
+            </span>
+            
+            <span *ngIf="(produit.quantiteTotale || 0) <= 0" class="status-out">
+              ❌ Hors stock
+            </span>
+          </td>
+          <td>
+            <button>
+              {{ produit.isExpanded ? 'Cacher les lots' : 'Voir les lots' }}
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="produit.isExpanded" class="lots-row">
+          <td colspan="6" class="lots-cell">
+            
+            <div *ngIf="produit.lots && produit.lots.length > 0; else noLots" class="inner-table-container">
+              <table class="lots-table">
+                <thead>
+                  <tr>
+                    <th>ID Lot</th>
+                    <th>Quantité Unités</th>
+                    <th>Poids</th>
+                    <th>Date d'entrée</th>
+                    <th>Date de péremption</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let lot of produit.lots">
+                    <td>{{ lot.id }}</td>
+                    <td>{{ lot.quantite }}</td>
+                    <td>{{ lot.poids }} kg</td>
+                    <td>{{ lot.dateEntreeLot | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ lot.datePeremption | date:'dd/MM/yyyy' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <ng-template #noLots>
+              <p class="no-data">Aucun lot enregistré pour ce produit.</p>
+            </ng-template>
+
+          </td>
+        </tr>
+
+      </ng-container>
     </tbody>
   </table>
 </div>

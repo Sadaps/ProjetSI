@@ -8,10 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(
-    normalizationContext: ['groups' => ['produit:read']]
-)]
+#[ApiResource]
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 class Produit
 {
@@ -19,36 +18,44 @@ class Produit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['produit:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['produit:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['produit:read'])]
     private ?string $nomScientifique = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['produit:read'])]
     private ?string $fonction = null;
 
     #[ORM\Column(length: 150, nullable: true)]
+    #[Groups(['produit:read'])]
     private ?string $cosmos = null;
 
     /**
      * @var Collection<int, FournisPar>
      */
     #[ORM\OneToMany(targetEntity: FournisPar::class, mappedBy: 'produit')]
+    #[Groups(['produit:read'])]
     private Collection $fournisPar;
 
     /**
      * @var Collection<int, Lots>
      */
     #[ORM\OneToMany(targetEntity: Lots::class, mappedBy: 'produit')]
+    #[Groups(['produit:read'])]
     private Collection $lots;
 
     /**
      * @var Collection<int, Contenir>
      */
     #[ORM\OneToMany(targetEntity: Contenir::class, mappedBy: 'produit')]
+    #[Groups(['produit:read'])]
     private Collection $contenir;
 
     public function __construct()
@@ -199,5 +206,14 @@ class Produit
         }
 
         return $this;
+    }
+
+    public function getQuantiteTotale(): int
+    {
+        $total = 0;
+        foreach ($this->lots as $lot) {
+            $total += $lot->getQuantite();
+        }
+        return $total;
     }
 }

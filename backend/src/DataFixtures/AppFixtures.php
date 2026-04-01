@@ -43,7 +43,7 @@ class AppFixtures extends Fixture
                 ->setFonction($fonctionCom)->setFournisseur($fournisseur);
         $manager->persist($contact);
 
-        // --- 3. PRODUITS + LOTS ---
+        // --- 3. PRODUITS + LOTS (MODIFIÉ POUR PLUSIEURS LOTS) ---
         $vraisProduitsData = [
             ['nom' => 'Huile d\'Amande Douce', 'sci' => 'Prunus Amygdalus Dulcis Oil', 'fonc' => 'Émollient'],
             ['nom' => 'Charbon Actif', 'sci' => 'Carbo Vegetabilis', 'fonc' => 'Purifiant'],
@@ -66,20 +66,26 @@ class AppFixtures extends Fixture
             $manager->persist($produit);
             $produitsReferences[] = $produit;
 
+            // Liaison Fournisseur
             $fournisPar = new FournisPar();
             $fournisPar->setProduit($produit)->setFournisseur($fournisseur)
                        ->setPrix($faker->randomFloat(2, 5, 50))->setMOQ($faker->randomFloat(2, 1, 10));
             $manager->persist($fournisPar);
 
-            $lot = new Lots();
-            $lot->setPoids($faker->randomFloat(2, 5, 100))
-                ->setQuantite($faker->numberBetween(10, 100))
-                ->setDatePeremption($faker->dateTimeBetween('+1 year', '+3 years'))
-                ->setDateEntreeLot(new \DateTime())
-                ->setProduit($produit);
-            
-            $manager->persist($lot);
-            $lotsReferences[] = $lot; // <--- AJOUTÉ : On stocke le lot pour l'utiliser plus bas
+            // --- ICI : GÉNÉRATION DE 2 À 5 LOTS PAR PRODUIT ---
+            $nbLots = $faker->numberBetween(2, 5);
+            for ($j = 0; $j < $nbLots; $j++) {
+                $lot = new Lots();
+                $lot->setPoids($faker->randomFloat(2, 5, 100))
+                    ->setQuantite($faker->numberBetween(10, 100))
+                    ->setDatePeremption($faker->dateTimeBetween('+1 year', '+3 years'))
+                    // On décale un peu les dates d'entrée pour le réalisme
+                    ->setDateEntreeLot($faker->dateTimeBetween('-1 month', 'now'))
+                    ->setProduit($produit);
+                
+                $manager->persist($lot);
+                $lotsReferences[] = $lot;
+            }
         }
 
         // --- 4. FAKER PRODUITS ---
