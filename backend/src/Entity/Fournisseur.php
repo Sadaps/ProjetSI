@@ -7,24 +7,34 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['fournisseur:read']]
+)]
 #[ORM\Entity(repositoryClass: FournisseurRepository::class)]
 class Fournisseur
-{
-    #[ORM\Id]
+{#[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['fournisseur:read', 'produit:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['fournisseur:read', 'produit:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['fournisseur:read'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['fournisseur:read'])]
     private ?string $adresse = null;
+
+    #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'fournisseur')]
+    #[Groups(['fournisseur:read'])]
+    private Collection $contact;
 
     /**
      * @var Collection<int, FournisPar>
@@ -33,15 +43,16 @@ class Fournisseur
     private Collection $fournisPar;
 
     /**
-     * @var Collection<int, Contact>
+     * @var Collection<int, Commande>
      */
-    #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'fournisseur')]
-    private Collection $contact;
+    #[ORM\OneToMany(targetEntity: Commande::class, mappedBy: 'fournisseur')]
+    private Collection $commandes;
 
     public function __construct()
     {
         $this->fournisPar = new ArrayCollection();
         $this->contact = new ArrayCollection();
+        $this->commandes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -139,6 +150,36 @@ class Fournisseur
             // set the owning side to null (unless already changed)
             if ($contact->getFournisseur() === $this) {
                 $contact->setFournisseur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commande>
+     */
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): static
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes->add($commande);
+            $commande->setFournisseur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): static
+    {
+        if ($this->commandes->removeElement($commande)) {
+            // set the owning side to null (unless already changed)
+            if ($commande->getFournisseur() === $this) {
+                $commande->setFournisseur(null);
             }
         }
 
