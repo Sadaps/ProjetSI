@@ -1,159 +1,181 @@
-<div class="container p-4">
+  <div class="container p-4">
 
-  <div *ngIf="vueDetails && fournisseurSelectionne">
-    <button class="btn btn-link text-decoration-none mb-3 p-0" (click)="retourListe()">
-      <i class="bi bi-arrow-left"></i> Retour à la liste
-    </button>
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="h4 mb-0">{{ fournisseurSelectionne.nom }}</h2>
-      <span class="badge bg-success-subtle text-success">Actif</span>
-    </div>
-
-    <div class="card border-0 shadow-sm p-4 mb-4">
-      <div class="row">
-        <div class="col-md-6 border-end">
-          <p class="text-muted small mb-1"><i class="bi bi-geo-alt me-2"></i> Adresse</p>
-          <p class="mb-0 fw-bold">{{ fournisseurSelectionne.adresse }}</p>
-          <p class="text-muted">{{ fournisseurSelectionne.codePostal }} {{ fournisseurSelectionne.ville }}, {{ fournisseurSelectionne.pays }}</p>
-        </div>
-        <div class="col-md-3 border-end">
-          <p class="text-muted small mb-1"><i class="bi bi-telephone me-2"></i> Téléphone</p>
-          <p class="fw-bold">{{ fournisseurSelectionne.telephone }}</p>
-        </div>
-        <div class="col-md-3">
-          <p class="text-muted small mb-1"><i class="bi bi-envelope me-2"></i> Email</p>
-          <p class="text-primary fw-bold">{{ fournisseurSelectionne.email || 'non renseigné' }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="row g-3 mb-4 text-center">
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm p-3">
-          <div class="text-muted small">Total Commandes</div>
-          <div class="h4 fw-bold mb-0">{{ fournisseurSelectionne.commandes?.length || 0 }}</div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm p-3">
-          <div class="text-muted small">Montant Total</div>
-          <div class="h4 fw-bold mb-0">4500.00€</div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm p-3">
-          <div class="text-muted small">Contacts</div>
-          <div class="h4 fw-bold mb-0">{{ fournisseurSelectionne.contact?.length || 0 }}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-        <h6 class="mb-0 fw-bold">Contacts</h6>
-        <button class="btn btn-primary btn-sm">+ Ajouter un contact</button>
-      </div>
-      <div class="card-body p-0">
-        <div *ngFor="let c of fournisseurSelectionne.contact" class="d-flex align-items-center p-3 border-bottom">
-          <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-            {{ c.prenom?.charAt(0) }}{{ c.nom?.charAt(0) }}
-          </div>
-          <div class="flex-grow-1">
-            <div class="fw-bold">{{ c.prenom }} {{ c.nom }} <span class="badge bg-success-subtle text-success ms-2">Actif</span></div>
-            <div class="text-muted small">Responsable Commercial</div>
-          </div>
-          <div class="text-muted small"><i class="bi bi-envelope me-1"></i> {{ c.email }}</div>
-        </div>
-      </div>
+   <div class="row g-3 mb-4" *ngIf="!vueDetails">
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm border-0">
+      <div class="text-muted small">Fournisseurs Actifs</div>
+      <div class="h3 fw-bold text-success mb-0">3</div>
     </div>
   </div>
-
-
-  <div *ngIf="!vueDetails">
-    
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h2 class="h4 mb-0">Fournisseurs</h2>
-        <p class="text-muted small">{{ fournisseurs.length }} fournisseur(s) affiché(s)</p>
-      </div>
-      <button class="btn btn-primary" (click)="showForm = !showForm">
-        {{ showForm ? 'Fermer' : '+ Ajouter un fournisseur' }}
-      </button>
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm border-0">
+      <div class="text-muted small">Fournisseurs Suspendus</div>
+      <div class="h3 fw-bold text-danger mb-0">1</div>
     </div>
-
-    <div *ngIf="showForm" class="card shadow-sm border-0 mb-5 animated fadeIn">
-      <div class="card-header bg-white border-bottom p-3 fw-bold text-primary">
-         <i class="bi bi-building-plus me-2"></i> Nouveau fournisseur
-      </div>
-      <div class="card-body p-4">
-        <h6 class="text-uppercase text-muted small fw-bold mb-3">Informations Entreprise</h6>
-        <div class="row g-3 mb-4">
-          <div class="col-12">
-            <label class="form-label small">Nom de l'entreprise *</label>
-            <input type="text" class="form-control" [(ngModel)]="nouveauFournisseur.nom">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label small">Téléphone *</label>
-            <input type="text" class="form-control" [(ngModel)]="nouveauFournisseur.telephone">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label small">Email *</label>
-            <input type="email" class="form-control" [(ngModel)]="nouveauFournisseur.email">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label small">Ville</label>
-            <input type="text" class="form-control" [(ngModel)]="nouveauFournisseur.ville">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label small">Pays</label>
-            <select class="form-select" [(ngModel)]="nouveauFournisseur.pays">
-              <option value="France">France</option>
-              <option value="Maroc">Maroc</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label small">Statut</label>
-            <select class="form-select" [(ngModel)]="nouveauFournisseur.statut">
-              <option value="Actif">Actif</option>
-              <option value="Suspendu">Suspendu</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer bg-light p-3 text-end">
-        <button class="btn btn-outline-secondary me-2" (click)="showForm = false">Annuler</button>
-        <button class="btn btn-primary px-4" (click)="validerAjout()">Enregistrer</button>
-      </div>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-12 col-md-6 col-lg-4" *ngFor="let f of fournisseurs">
-        <div class="card h-100 shadow-sm border-0 p-3 card-hover" (click)="voirDetails(f.id)" style="cursor: pointer;">
-          <div class="d-flex justify-content-between mb-2">
-            <div class="bg-primary-subtle p-2 rounded text-primary">
-              <i class="bi bi-people-fill"></i>
-            </div>
-            <span class="badge" [ngClass]="f.statut === 'Suspendu' ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'">
-              {{ f.statut || 'Actif' }}
-            </span>
-          </div>
-          <h5 class="fw-bold mb-1">{{ f.nom }}</h5>
-          <p class="text-muted small mb-3">{{ f.ville || 'Ville' }}, {{ f.pays || 'Pays' }}</p>
-          <div class="small text-secondary mb-3">
-            <div class="mb-1"><i class="bi bi-envelope me-2"></i> {{ f.email || 'contact@mail.com' }}</div>
-            <div class="mb-1"><i class="bi bi-telephone me-2"></i> {{ f.telephone }}</div>
-          </div>
-          <div class="mt-auto border-top pt-2">
-            <button class="btn btn-sm btn-link p-0 text-decoration-none">Voir les détails →</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="fournisseurs.length === 0" class="text-center py-5 text-muted">
-      <i class="bi bi-inbox h1 d-block mb-3"></i>
-      Aucun fournisseur trouvé.
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm border-0">
+      <div class="text-muted small">Total Contacts</div>
+      <div class="h3 fw-bold text-primary mb-0">5</div>
     </div>
   </div>
 </div>
+
+    <div *ngIf="vueDetails && fournisseurSelectionne">
+      <button class="btn btn-link text-decoration-none mb-3 p-0" (click)="retourListe()">
+        <i class="bi bi-arrow-left"></i> Retour à la liste
+      </button>
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h4 mb-0">{{ fournisseurSelectionne.nom }}</h2>
+        <span class="badge bg-success-subtle text-success">Actif</span>
+      </div>
+
+      <div class="card border-0 shadow-sm p-4 mb-4">
+        <div class="row">
+          <div class="col-md-6 border-end">
+            <p class="text-muted small mb-1"><i class="bi bi-geo-alt me-2"></i> Adresse</p>
+            <p class="mb-0 fw-bold">{{ fournisseurSelectionne.adresse }}</p>
+            <p class="text-muted">{{ fournisseurSelectionne.codePostal }} {{ fournisseurSelectionne.ville }}, {{ fournisseurSelectionne.pays }}</p>
+          </div>
+          <div class="col-md-3 border-end">
+            <p class="text-muted small mb-1"><i class="bi bi-telephone me-2"></i> Téléphone</p>
+            <p class="fw-bold">{{ fournisseurSelectionne.telephone }}</p>
+          </div>
+          <div class="col-md-3">
+            <p class="text-muted small mb-1"><i class="bi bi-envelope me-2"></i> Email</p>
+            <p class="text-primary fw-bold">{{ fournisseurSelectionne.email || 'non renseigné' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4 text-center">
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="text-muted small">Total Commandes</div>
+            <div class="h4 fw-bold mb-0">{{ fournisseurSelectionne.commandes?.length || 0 }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="text-muted small">Montant Total</div>
+            <div class="h4 fw-bold mb-0">4500.00€</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm p-3">
+            <div class="text-muted small">Contacts</div>
+            <div class="h4 fw-bold mb-0">{{ fournisseurSelectionne.contact?.length || 0 }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+          <h6 class="mb-0 fw-bold">Contacts</h6>
+          <button class="btn btn-primary btn-sm">+ Ajouter un contact</button>
+        </div>
+        <div class="card-body p-0">
+          <div *ngFor="let c of fournisseurSelectionne.contact" class="d-flex align-items-center p-3 border-bottom">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+              {{ c.prenom?.charAt(0) }}{{ c.nom?.charAt(0) }}
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-bold">{{ c.prenom }} {{ c.nom }} <span class="badge bg-success-subtle text-success ms-2">Actif</span></div>
+              <div class="text-muted small">Responsable Commercial</div>
+            </div>
+            <div class="text-muted small"><i class="bi bi-envelope me-1"></i> {{ c.email }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div *ngIf="!vueDetails">
+      
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="h4 mb-0">Fournisseurs</h2>
+          <p class="text-muted small">{{ fournisseurs.length }} fournisseur(s) affiché(s)</p>
+        </div>
+        <button class="btn btn-primary" (click)="showForm = !showForm">
+          {{ showForm ? 'Fermer' : '+ Ajouter un fournisseur' }}
+        </button>
+      </div>
+
+      <div *ngIf="showForm" class="card shadow-sm border-0 mb-5 animated fadeIn">
+        <div class="card-header bg-white border-bottom p-3 fw-bold text-primary">
+          <i class="bi bi-building-plus me-2"></i> Nouveau fournisseur
+        </div>
+        <div class="card-body p-4">
+          <h6 class="text-uppercase text-muted small fw-bold mb-3">Informations Entreprise</h6>
+          <div class="row g-3 mb-4">
+            <div class="col-12">
+              <label class="form-label small">Nom de l'entreprise *</label>
+              <input type="text" class="form-control" [(ngModel)]="nouveauFournisseur.nom">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">Téléphone *</label>
+              <input type="text" class="form-control" [(ngModel)]="nouveauFournisseur.telephone">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small">Email *</label>
+              <input type="email" class="form-control" [(ngModel)]="nouveauFournisseur.email">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Ville</label>
+              <input type="text" class="form-control" [(ngModel)]="nouveauFournisseur.ville">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Pays *</label>
+    <input 
+    type="text" 
+    class="form-control" 
+    placeholder="Ex: Belgique, Italie..." 
+    [(ngModel)]="nouveauFournisseur.pays">
+                  </div>
+            <div class="col-md-4">
+              <label class="form-label small">Statut</label>
+              <select class="form-select" [(ngModel)]="nouveauFournisseur.statut">
+                <option value="Actif">Actif</option>
+                <option value="Suspendu">Suspendu</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-light p-3 text-end">
+          <button class="btn btn-outline-secondary me-2" (click)="showForm = false">Annuler</button>
+          <button class="btn btn-primary px-4" (click)="validerAjout()">Enregistrer</button>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-12 col-md-6 col-lg-4" *ngFor="let f of fournisseurs">
+          <div class="card h-100 shadow-sm border-0 p-3 card-hover" (click)="voirDetails(f.id)" style="cursor: pointer;">
+            <div class="d-flex justify-content-between mb-2">
+              <div class="bg-primary-subtle p-2 rounded text-primary">
+                <i class="bi bi-people-fill"></i>
+              </div>
+              <span class="badge" [ngClass]="f.statut === 'Suspendu' ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'">
+                {{ f.statut || 'Actif' }}
+              </span>
+            </div>
+            <h5 class="fw-bold mb-1">{{ f.nom }}</h5>
+            <p class="text-muted small mb-3">{{ f.ville || 'Ville' }}, {{ f.pays || 'Pays' }}</p>
+            <div class="small text-secondary mb-3">
+              <div class="mb-1"><i class="bi bi-envelope me-2"></i> {{ f.email || 'contact@mail.com' }}</div>
+              <div class="mb-1"><i class="bi bi-telephone me-2"></i> {{ f.telephone }}</div>
+            </div>
+            <div class="mt-auto border-top pt-2">
+              <button class="btn btn-sm btn-link p-0 text-decoration-none">Voir les détails →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="fournisseurs.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-inbox h1 d-block mb-3"></i>
+        Aucun fournisseur trouvé.
+      </div>
+    </div>
+  </div>

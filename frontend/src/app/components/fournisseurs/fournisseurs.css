@@ -1,0 +1,96 @@
+/* Fond de page gris très léger comme dans l'image */
+:host {
+  display: block;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* Style des cartes pour correspondre à fournisseur_list.png */
+.card {
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+}
+
+/* Badges de statut (Actif / Suspendu) */
+.badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.bg-success-subtle { background-color: #e6f4ea; color: #1e7e34; }
+.bg-danger-subtle { background-color: #fce8e8; color: #d93025; }
+.bg-primary-subtle { background-color: #e8f0fe; color: #1a73e8; }
+
+/* En-tête des sections de détails */
+.border-end {
+  border-right: 1px solid #eee !important;
+}
+
+/* Animation fluide pour l'apparition du formulaire */
+.animated {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fadeIn { animation-name: fadeIn; }
+
+/* Icônes de contact (Avatar cercle) */
+.rounded-circle {
+  font-weight: bold;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+/* Style global du container */
+.container {
+    background-color: #f8f9fa; /* Gris très clair en fond */
+    min-height: 100vh;
+}
+
+/* Les cartes (Cards) */
+.card {
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Les badges */
+.badge {
+    padding: 0.5em 1em;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.bg-success-subtle { background-color: #d1e7dd !important; color: #0f5132 !important; }
+.bg-danger-subtle { background-color: #f8d7da !important; color: #842029 !important; }
+.bg-primary-subtle { background-color: #cfe2ff !important; color: #084298 !important; }
+
+/* Icônes */
+.bg-primary-subtle i {
+    font-size: 1.2rem;
+}
+
+/* Typographie */
+h2, h4, h5 {
+    color: #334155;
+    font-weight: 600;
+}
