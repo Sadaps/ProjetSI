@@ -54,6 +54,10 @@ class Commande
     #[Groups(['commande:read'])]
     private ?Fournisseur $fournisseur = null;
 
+    #[ORM\Column(length: 50)]
+    #[Groups(['commande:read'])]
+    private ?string $statut = null;
+
     public function __construct()
     {
         // Maintenant ces lignes ne feront plus d'erreur
@@ -125,4 +129,16 @@ class Commande
 
     public function getFournisseur(): ?Fournisseur { return $this->fournisseur; }
     public function setFournisseur(?Fournisseur $fournisseur): static { $this->fournisseur = $fournisseur; return $this; }
+
+    public function getStatut(): ?string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): static
+    {
+        $this->statut = $statut;
+
+        return $this;
+    }
 }

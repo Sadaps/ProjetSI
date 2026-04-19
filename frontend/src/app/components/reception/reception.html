@@ -8,13 +8,19 @@
   
 <div class="form-group">
   <label>Sélectionner la commande reçue <span class="text-red">*</span></label>
-  <select [(ngModel)]="selectedCommande" (change)="onCommandeChange()" class="form-control">
+  
+  <select *ngIf="commandesEnAttente.length > 0" 
+          [(ngModel)]="selectedCommande" 
+          (change)="onCommandeChange()" 
+          class="form-control">
     <option [ngValue]="null">-- Choisissez une commande --</option>
-    
     <option *ngFor="let cmd of commandesEnAttente" [ngValue]="cmd">
       Commande n°{{ cmd.id }} - {{ cmd.date_commande | date:'dd/MM/yyyy' }}
     </option>
   </select>
+  <div *ngIf="commandesEnAttente.length === 0" class="alert alert-info">
+    ℹ️ Aucune commande en attente de réception pour le moment.
+  </div>
 </div>
 
     <div class="form-group flex-1">
@@ -70,7 +76,8 @@
     <hr *ngIf="i < lignesLots.length - 1">
   </div>
 
-  <div class="form-actions">
-    <button class="btn-primary" (click)="validerReception()">✓ Valider la réception</button>
-  </div>
+<button class="btn-primary" [disabled]="isSubmitting" (click)="validerReception()">
+  <span *ngIf="!isSubmitting">✓ Valider la réception</span>
+  <span *ngIf="isSubmitting">⏳ Enregistrement en cours...</span>
+</button>
 </div>

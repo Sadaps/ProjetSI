@@ -102,15 +102,22 @@ class AppFixtures extends Fixture
 
         // --- 5. COMMANDE ---
         $commande = new Commande();
-        $commande->setDateCommande(new \DateTime())->setPrix('450.00')
-                 ->setDelaiMin(3)->setDelaiMax(7)->setFournisseur($fournisseur);
+        $commande->setDateCommande(new \DateTime())
+                 ->setPrix('450.00')
+                 ->setDelaiMin(3)
+                 ->setDelaiMax(7)
+                 ->setFournisseur($fournisseur)
+                 ->setStatut('En attente'); 
+        
         $manager->persist($commande);
 
-        foreach ([$produitsReferences[0], $produitsReferences[1]] as $p) {
-            $contenir = new Contenir();
-            $contenir->setCommande($commande)->setProduit($p)->setQuantite(10);
-            $manager->persist($contenir);
-        }
+foreach ([$produitsReferences[0], $produitsReferences[1]] as $p) {
+    $contenir = new Contenir();
+    $contenir->setCommande($commande)
+             ->setProduit($p)
+             ->setQuantite(10);
+    $manager->persist($contenir);
+}
 
         // --- 7. INVENTAIRE ---
         $inventaire = new Inventaire();
