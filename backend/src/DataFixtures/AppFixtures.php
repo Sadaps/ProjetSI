@@ -33,15 +33,40 @@ class AppFixtures extends Fixture
         $catCosmetique->setNom('Cosmétique')->setDenomination('C');
         $manager->persist($catCosmetique);
 
-        // --- 2. FOURNISSEUR ---
-        $fournisseur = new Fournisseur();
-        $fournisseur->setNom('BioPlant France')->setTelephone('0102030405')->setAdresse('123 rue des Plantes, Paris');
-        $manager->persist($fournisseur);
+        // --- 2. FOURNISSEURS ET CONTACTS AVEC FAKER ---
 
+// On prépare une boîte (un tableau) pour stocker nos fournisseurs créés
+$fournisseursReferences = []; 
+
+// Créons 5 fournisseurs aléatoires
+for ($i = 0; $i < 5; $i++) {
+    $fournisseur = new Fournisseur();
+    
+    // Faker génère de vrais noms d'entreprises, téléphones et adresses françaises
+    $fournisseur->setNom($faker->company())
+                ->setTelephone($faker->phoneNumber())
+                ->setAdresse($faker->address());
+                
+    $manager->persist($fournisseur);
+    
+    // On sauvegarde ce fournisseur dans notre tableau pour l'utiliser plus tard dans les commandes
+    $fournisseursReferences[] = $fournisseur;
+
+    // Pour CHAQUE fournisseur, on crée entre 1 et 3 contacts
+    $nombreDeContacts = $faker->numberBetween(1, 3);
+    
+    for ($k = 0; $k < $nombreDeContacts; $k++) {
         $contact = new Contact();
-        $contact->setNom('Dupont')->setPrenom('Jean')->setMail('jean.dupont@bioplant.fr')
-                ->setFonction($fonctionCom)->setFournisseur($fournisseur);
+        $contact->setNom($faker->lastName())
+                ->setPrenom($faker->firstName())
+                // companyEmail génère une adresse mail basée sur le nom généré
+                ->setMail($faker->companyEmail()) 
+                ->setFonction($fonctionCom) // Assure-toi que $fonctionCom est bien créé juste avant !
+                ->setFournisseur($fournisseur);
+                
         $manager->persist($contact);
+    }
+}
 
         // --- 3. PRODUITS + LOTS (MODIFIÉ POUR PLUSIEURS LOTS) ---
         $vraisProduitsData = [
@@ -101,22 +126,47 @@ class AppFixtures extends Fixture
         }
 
         // --- 5. COMMANDE ---
-        $commande = new Commande();
-        $commande->setDateCommande(new \DateTime())
-                 ->setPrix('450.00')
-                 ->setDelaiMin(3)
-                 ->setDelaiMax(7)
-                 ->setFournisseur($fournisseur)
-                 ->setStatut('En attente'); 
-        
-        $manager->persist($commande);
+       // On boucle pour créer 15 commandes
+for ($i = 0; $i < 15; $i++) {
+    $commande = new Commande();
+    
+    // Génération de données aléatoires réalistes
+             $commande->setDateCommande($faker->dateTimeBetween('-2 months', '+1 month'))
+             ->setPrix($faker->randomFloat(2, 50, 3000)) // Prix entre 50.00 et 3000.00
+             ->setDelaiMin($faker->numberBetween(1, 3))
+             ->setDelaiMax($faker->numberBetween(4, 15))
+             ->setFournisseur($faker->randomElement($fournisseursReferences))
+             // On met plus de "En attente" pour que tu aies de quoi tester ta réception sur Angular
+             ->setStatut($faker->randomElement(['En attente', 'En attente', 'En attente', 'Reçue', 'Annulée'])); 
+    
+    $manager->persist($commande);
 
-foreach ([$produitsReferences[0], $produitsReferences[1]] as $p) {
-    $contenir = new Contenir();
-    $contenir->setCommande($commande)
-             ->setProduit($p)
-             ->setQuantite(10);
-    $manager->persist($contenir);
+    // On va ajouter entre 1 et 4 produits aléatoires à cette commande
+    $nombreProduits = $faker->numberBetween(1, 4);
+    
+    // On copie et on mélange ton tableau de références pour piocher au hasard sans avoir de doublons
+    $produitsMelanges = $produitsReferences;
+    shuffle($produitsMelanges);
+
+for ($j = 0; $j < $nombreProduits; $j++) {
+        // On stocke la quantité dans une variable pour s'en servir pour le calcul du poids
+        $quantiteAchetee = $faker->numberBetween(5, 100);
+        
+        // On invente un faux poids unitaire pour le test (ex: entre 0.5kg et 5kg l'unité)
+        $fauxPoidsUnitaire = $faker->randomFloat(2, 0.5, 5.0); 
+        
+        // Le poids total attendu = quantité * poids unitaire
+        $poidsTotalAttendu = $quantiteAchetee * $fauxPoidsUnitaire;
+
+        $contenir = new Contenir();
+        $contenir->setCommande($commande)
+                 ->setProduit($produitsMelanges[$j]) 
+                 ->setQuantite($quantiteAchetee)
+                 // 👈 AJOUT : On enregistre le poids attendu en format "string" pour le type Decimal
+                 ->setPoidsAttendu(number_format($poidsTotalAttendu, 2, '.', '')); 
+        
+        $manager->persist($contenir);
+    }
 }
 
         // --- 7. INVENTAIRE ---

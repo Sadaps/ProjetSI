@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ContenirRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
@@ -31,6 +32,10 @@ class Contenir
     #[ORM\JoinColumn(nullable: false)]
 #[Groups(['contenir:read', 'commande:read'])]
     private ?Produit $produit = null;
+    
+#[Groups(['contenir:read', 'commande:read'])]
+    #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2, nullable: true)]
+    private ?string $poids_attendu = null;
 
     public function getId(): ?int { return $this->id; }
 
@@ -42,4 +47,16 @@ class Contenir
 
     public function getProduit(): ?Produit { return $this->produit; }
     public function setProduit(?Produit $produit): static { $this->produit = $produit; return $this; }
+
+    public function getPoidsAttendu(): ?string
+    {
+        return $this->poids_attendu;
+    }
+
+    public function setPoidsAttendu(?string $poids_attendu): static
+    {
+        $this->poids_attendu = $poids_attendu;
+
+        return $this;
+    }
 }

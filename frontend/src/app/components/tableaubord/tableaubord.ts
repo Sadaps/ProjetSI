@@ -22,7 +22,6 @@ export class Tableaubord implements OnInit {
 
     this.produitService.getProduits().subscribe({
       next: (data) => {
-        console.log('🕵️ Réponse brute :', data); 
         this.produits = data.member || data['hydra:member'] || []; 
         
         // 3. LA MAGIE : On dit à Angular de valider ce nouveau chiffre immédiatement

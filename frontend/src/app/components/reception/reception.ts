@@ -29,21 +29,32 @@ export class Reception implements OnInit {
   
   lignesLots: LigneReception[] = [];
   commandesEnAttente: any[] = [];
-  
+  isLoading: boolean = true;
   // Empêche les doubles clics pendant l'envoi
   isSubmitting: boolean = false;
 
   constructor(private commandeService: CommandeService, private router: Router) {}
 
-  ngOnInit() {
+ngOnInit() {
+    // La requête part, le HTML affiche le sablier (isLoading est à true)
+    
     this.commandeService.getCommandes().subscribe({
       next: (reponseApi) => {
-        const toutesLesCommandes = reponseApi.member || reponseApi['hydra:member'];
+        // On sécurise avec || [] pour éviter les erreurs si l'API est vide
+        const toutesLesCommandes = reponseApi.member || reponseApi['hydra:member'] || [];
+        
         this.commandesEnAttente = toutesLesCommandes.filter((cmd: any) => cmd.statut !== 'Reçue');
         console.log('Commandes chargées depuis Symfony :', this.commandesEnAttente);
+        
+        // C'est bon, on a les données, on cache le message de chargement !
+        this.isLoading = false; 
       },
       error: (erreur) => {
         console.error('Erreur lors du chargement des commandes', erreur);
+        
+        // En cas d'erreur (ex: serveur éteint), on arrête aussi le chargement
+        // pour ne pas bloquer l'utilisateur sur un sablier infini.
+        this.isLoading = false; 
       }
     });
   }
@@ -62,13 +73,15 @@ onCommandeChange() {
         nomScientifique: item.produit.nomScientifique,
         quantitePrevue: item.quantite,
         numeroLot: '',
-        poidsReel: null,
+        // Au lieu de null, on met par défaut le poids attendu !
+        // L'utilisateur pourra le modifier si le vrai poids mesuré est différent.
+        poidsReel: item.poids_attendu ? parseFloat(item.poids_attendu) : null, 
         datePeremption: ''
       };
     });
   }
 
-  validerReception() {
+validerReception() {
     // 1. Validation : on vérifie les dates obligatoires
     const formulaireIncomplet = this.lignesLots.some(ligne => !ligne.datePeremption);
     if (formulaireIncomplet) {
@@ -80,7 +93,7 @@ onCommandeChange() {
     this.isSubmitting = true;
 
     // 2. Préparation des missions (Requêtes)
-   const missions = this.lignesLots.map(ligne => {
+    const missions = this.lignesLots.map(ligne => {
       
       const nouveauLot = {
         produit: ligne.produitIri, // <-- On utilise directement la bonne adresse !
@@ -92,19 +105,24 @@ onCommandeChange() {
 
       return this.commandeService.creerLot(nouveauLot).pipe(
         switchMap((lotCree: any) => {
+          
+          // --- C'EST ICI QUE ÇA CHANGE ---
           const nouveauRecu = {
             commande: `/api/commandes/${this.selectedCommande.id}`,
             lot: lotCree['@id'], 
             quantite: ligne.quantitePrevue,
-            date_reception: this.dateReception
+            date_reception: this.dateReception,
+            notes: this.notes // 👈 ON AJOUTE LA NOTE ICI
           };
+          // ---------------------------------
+
           return this.commandeService.creerRecu(nouveauRecu);
         })
       );
     });
 
     // 3. Exécution de toutes les requêtes
-forkJoin(missions).subscribe({
+    forkJoin(missions).subscribe({
       next: (resultats) => {
         // LES LOTS SONT CRÉÉS ! Maintenant on met à jour la commande.
         this.commandeService.changerStatutCommande(this.selectedCommande.id, 'Reçue').subscribe({
@@ -115,6 +133,7 @@ forkJoin(missions).subscribe({
           error: (err) => {
              console.error("Erreur lors du changement de statut", err);
              alert("Lots créés, mais impossible de clôturer la commande.");
+             this.isSubmitting = false; // On débloque le bouton en cas d'erreur ici aussi
           }
         });
       },

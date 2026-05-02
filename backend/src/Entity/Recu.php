@@ -36,6 +36,9 @@ class Recu
     
     private ?Lots $lot = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $notes = null;
+
     public function getId(): ?int { return $this->id; }
 
     public function getQuantite(): ?int { return $this->quantite; }
@@ -49,4 +52,16 @@ class Recu
 
     public function getLot(): ?Lots { return $this->lot; }
     public function setLot(?Lots $lot): static { $this->lot = $lot; return $this; }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): static
+    {
+        $this->notes = $notes;
+
+        return $this;
+    }
 }

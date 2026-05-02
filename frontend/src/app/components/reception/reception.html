@@ -8,19 +8,33 @@
   
 <div class="form-group">
   <label>Sélectionner la commande reçue <span class="text-red">*</span></label>
-  
-  <select *ngIf="commandesEnAttente.length > 0" 
-          [(ngModel)]="selectedCommande" 
-          (change)="onCommandeChange()" 
-          class="form-control">
-    <option [ngValue]="null">-- Choisissez une commande --</option>
-    <option *ngFor="let cmd of commandesEnAttente" [ngValue]="cmd">
-      Commande n°{{ cmd.id }} - {{ cmd.date_commande | date:'dd/MM/yyyy' }}
-    </option>
-  </select>
-  <div *ngIf="commandesEnAttente.length === 0" class="alert alert-info">
-    ℹ️ Aucune commande en attente de réception pour le moment.
+
+  <!-- CAS 1 : C'EST EN COURS DE CHARGEMENT -->
+  <div *ngIf="isLoading" class="alert alert-warning" style="display: flex; align-items: center; gap: 10px;">
+    <!-- Tu peux mettre un petit sablier ou une icône qui tourne -->
+    <span>⏳</span> Chargement des commandes en cours... Veuillez patienter.
   </div>
+
+  <!-- CAS 2 : LE CHARGEMENT EST TERMINÉ (!isLoading) -->
+  <ng-container *ngIf="!isLoading">
+  
+    <!-- S'il y a des commandes trouvées -->
+    <select *ngIf="commandesEnAttente.length > 0" 
+            [(ngModel)]="selectedCommande" 
+            (change)="onCommandeChange()" 
+            class="form-control">
+      <option [ngValue]="null">-- Choisissez une commande --</option>
+      <option *ngFor="let cmd of commandesEnAttente" [ngValue]="cmd">
+        Commande n°{{ cmd.id }} - {{ cmd.date_commande | date:'dd/MM/yyyy' }}
+      </option>
+    </select>
+
+    <!-- S'il n'y a vraiment aucune commande -->
+    <div *ngIf="commandesEnAttente.length === 0" class="alert alert-info">
+      ℹ️ Aucune commande en attente de réception pour le moment.
+    </div>
+    
+  </ng-container>
 </div>
 
     <div class="form-group flex-1">
