@@ -94,3 +94,35 @@ h2, h4, h5 {
     color: #334155;
     font-weight: 600;
 }
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* On s'assure que le surlignage reste propre */
+::ng-deep mark {
+  background-color: #ffeb3b !important;
+  color: #2b3674 !important;
+  padding: 0 2px;
+  border-radius: 3px;
+  font-weight: bold;
+}

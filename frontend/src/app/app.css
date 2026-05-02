@@ -1,29 +1,218 @@
+/* Import de la police Inter pour un look moderne et professionnel (optionnel) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* --- STRUCTURE GLOBALE --- */
 .dashboard-container {
   display: flex;
   height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #f4f7fe; /* Gris/bleu très clair moderne */
+  font-family: 'Inter', sans-serif;
 }
 
+/* --- BARRE LATÉRALE (SIDEBAR) --- */
 .sidebar {
-  width: 250px;
-  background: white;
-  border-right: 1px solid #eee;
-  padding: 20px;
+  width: 260px;
+  background: #ffffff;
+  padding: 30px 20px;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.03); /* Ombre douce pour séparer du fond */
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
 }
 
+.logo {
+  margin-bottom: 40px;
+  padding-left: 10px;
+}
+
+.logo h2 {
+  margin: 0;
+  color: #2b3674; /* Bleu nuit élégant */
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo h2 i {
+  color: #4318ff; /* Couleur de l'icône du logo */
+}
+
+.logo small {
+  color: #a3aed1;
+  font-size: 13px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* --- MENU DE NAVIGATION --- */
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espace vertical entre chaque bouton */
+}
+
+.nav-links li a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #a3aed1; /* Texte gris par défaut */
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  gap: 15px;
+}
+
+.nav-links li a .icon {
+  font-size: 20px;
+  color: #a3aed1; /* Icône grise par défaut */
+  transition: all 0.3s ease;
+}
+
+/* Effets au survol d'un lien inactif */
+.nav-links li a:hover {
+  background-color: #f4f7fe;
+  color: #4318ff;
+}
+
+.nav-links li a:hover .icon {
+  color: #4318ff; /* L'icône devient bleue au survol */
+}
+
+/* Style de la page active (Géré automatiquement par routerLinkActive) */
+.nav-links li a.active {
+  background-color: #4318ff; /* Bleu principal */
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(67, 24, 255, 0.25); /* Lueur douce */
+}
+
+.nav-links li a.active .icon {
+  color: #ffffff; /* L'icône devient blanche */
+}
+
+/* --- CONTENEUR DROIT (TOP BAR + CONTENU) --- */
 .content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Empêche le scroll global de la page */
 }
 
+/* --- BARRE SUPÉRIEURE (TOP BAR) --- */
 .top-bar {
-  height: 60px;
-  background: white;
+  height: 80px;
+  background: #ffffff;
   display: flex;
   align-items: center;
-  padding: 0 30px;
+  padding: 0 40px;
   justify-content: space-between;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  z-index: 10;
 }
 
+/* Barre de recherche stylisée */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #f4f7fe;
+  border-radius: 30px; /* Forme de pilule */
+  padding: 12px 20px;
+  width: 350px;
+  transition: all 0.3s ease;
+}
 
+.search-bar:focus-within {
+  box-shadow: 0 0 0 2px rgba(67, 24, 255, 0.2); /* Liseré bleu au clic */
+}
+
+.search-icon {
+  margin-right: 10px;
+  font-size: 16px;
+  color: #a3aed1;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  color: #2b3674;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.search-bar input::placeholder {
+  color: #a3aed1;
+}
+
+/* Profil et Notifications */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.bell-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.bell {
+  font-size: 22px;
+  color: #a3aed1;
+  transition: color 0.3s ease;
+}
+
+.bell:hover {
+  color: #2b3674;
+}
+
+/* Petit point rouge pour les notifications */
+.notification-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #ff3b30;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  background: #4318ff;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.user-name {
+  color: #2b3674;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* --- ZONE D'AFFICHAGE DES PAGES INTERNES --- */
+.main-body {
+  flex: 1;
+  padding: 30px 40px;
+  overflow-y: auto; /* Le scroll se fera uniquement ici si ton tableau est long */
+}

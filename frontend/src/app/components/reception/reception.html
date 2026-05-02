@@ -6,70 +6,71 @@
 <div class="card form-card">
   <h3>Informations de la commande</h3>
   
-<div class="form-group">
-  <label>Sélectionner la commande reçue <span class="text-red">*</span></label>
+  <div class="form-group">
+    <label>Sélectionner la commande reçue <span class="text-red">*</span></label>
 
-  <!-- CAS 1 : C'EST EN COURS DE CHARGEMENT -->
-  <div *ngIf="isLoading" class="alert alert-warning" style="display: flex; align-items: center; gap: 10px;">
-    <!-- Tu peux mettre un petit sablier ou une icône qui tourne -->
-    <span>⏳</span> Chargement des commandes en cours... Veuillez patienter.
+    <!-- CAS 1 : C'EST EN COURS DE CHARGEMENT -->
+    <div *ngIf="isLoading" class="alert alert-warning" style="display: flex; align-items: center; gap: 10px;">
+      <span>⏳</span> Chargement des commandes en cours... Veuillez patienter.
+    </div>
+
+    <!-- CAS 2 : LE CHARGEMENT EST TERMINÉ (!isLoading) -->
+    <ng-container *ngIf="!isLoading">
+    
+      <!-- S'il y a des commandes trouvées -->
+      <select *ngIf="commandesEnAttente.length > 0" 
+              [(ngModel)]="selectedCommande" 
+              (change)="onCommandeChange()" 
+              class="form-control">
+        <option [ngValue]="null">-- Choisissez une commande --</option>
+        <option *ngFor="let cmd of commandesEnAttente" [ngValue]="cmd">
+          Commande n°{{ cmd.id }} - {{ cmd.date_commande | date:'dd/MM/yyyy' }}
+        </option>
+      </select>
+
+      <!-- S'il n'y a vraiment aucune commande -->
+      <div *ngIf="commandesEnAttente.length === 0" class="alert alert-info">
+        ℹ️ Aucune commande en attente de réception pour le moment.
+      </div>
+      
+    </ng-container>
   </div>
 
-  <!-- CAS 2 : LE CHARGEMENT EST TERMINÉ (!isLoading) -->
-  <ng-container *ngIf="!isLoading">
-  
-    <!-- S'il y a des commandes trouvées -->
-    <select *ngIf="commandesEnAttente.length > 0" 
-            [(ngModel)]="selectedCommande" 
-            (change)="onCommandeChange()" 
-            class="form-control">
-      <option [ngValue]="null">-- Choisissez une commande --</option>
-      <option *ngFor="let cmd of commandesEnAttente" [ngValue]="cmd">
-        Commande n°{{ cmd.id }} - {{ cmd.date_commande | date:'dd/MM/yyyy' }}
-      </option>
-    </select>
-
-    <!-- S'il n'y a vraiment aucune commande -->
-    <div *ngIf="commandesEnAttente.length === 0" class="alert alert-info">
-      ℹ️ Aucune commande en attente de réception pour le moment.
-    </div>
-    
-  </ng-container>
+  <div class="form-group flex-1">
+    <label>Date de réception <span class="text-red">*</span></label>
+    <input type="date" [(ngModel)]="dateReception">
+  </div>
 </div>
 
-    <div class="form-group flex-1">
-      <label>Date de réception <span class="text-red">*</span></label>
-      <input type="date" [(ngModel)]="dateReception">
-    </div>
+<div class="cmd-details-box" *ngIf="selectedCommande">
+  <div>
+    <small>Fournisseur</small>
+    <!-- SURLIGNAGE : Nom du fournisseur -->
+    <strong [innerHTML]="selectedCommande?.fournisseur?.nom | highlight:motTape"></strong>
   </div>
+  <div>
+    <small>Date de commande</small>
+    <strong>{{ selectedCommande.date_commande | date:'dd/MM/yyyy' }}</strong>
+  </div>
+  <div>
+    <small>Montant total</small>
+    <strong>{{ selectedCommande.prix }}</strong>
+  </div>
+</div>
 
-  <div class="cmd-details-box" *ngIf="selectedCommande">
-    <div>
-      <small>Fournisseur</small>
-      <strong>{{ selectedCommande?.fournisseur?.nom }}</strong>
-    </div>
-    <div>
-      <small>Date de commande</small>
-      <strong>{{ selectedCommande.date_commande | date:'dd/MM/yyyy' }}</strong>
-    </div>
-    <div>
-      <small>Montant total</small>
-      <strong>{{ selectedCommande.prix }}</strong>
-    </div>
-  </div>
-
-  <div class="form-group mt-15">
-    <label>Notes et observations</label>
-    <textarea [(ngModel)]="notes" rows="4" placeholder="Ajouter des notes concernant la réception..."></textarea>
-  </div>
+<div class="form-group mt-15">
+  <label>Notes et observations</label>
+  <textarea [(ngModel)]="notes" rows="4" placeholder="Ajouter des notes concernant la réception..."></textarea>
+</div>
 
 <div class="card form-card mt-20" *ngIf="selectedCommande">
   <h3>Détails des lots reçus</h3>
   
   <div *ngFor="let ligne of lignesLots; let i = index" class="lot-row">
     <div class="lot-info-produit">
-      <strong>{{ ligne.nomProduit }}</strong>
-      <small>{{ ligne.nomScientifique }}</small>
+      <!-- SURLIGNAGE : Nom du produit et nom scientifique -->
+      <strong [innerHTML]="ligne.nomProduit | highlight:motTape"></strong>
+      <small [innerHTML]="ligne.nomScientifique | highlight:motTape"></small>
       <span class="badge">Prévu : {{ ligne.quantitePrevue }} unités</span>
     </div>
 
@@ -90,8 +91,8 @@
     <hr *ngIf="i < lignesLots.length - 1">
   </div>
 
-<button class="btn-primary" [disabled]="isSubmitting" (click)="validerReception()">
-  <span *ngIf="!isSubmitting">✓ Valider la réception</span>
-  <span *ngIf="isSubmitting">⏳ Enregistrement en cours...</span>
-</button>
+  <button class="btn-primary" [disabled]="isSubmitting" (click)="validerReception()">
+    <span *ngIf="!isSubmitting">✓ Valider la réception</span>
+    <span *ngIf="isSubmitting">⏳ Enregistrement en cours...</span>
+  </button>
 </div>

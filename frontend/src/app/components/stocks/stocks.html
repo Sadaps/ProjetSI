@@ -22,10 +22,12 @@
         
         <tr (click)="toggleLots(produit)" class="produit-row" style="cursor: pointer;">
           <td>{{ produit.id }}</td>
-          <td><strong>{{ produit.nom }}</strong></td>
-          <td>{{ produit.nomScientifique }}</td>
-          <td>{{ produit.fonction || 'Non défini' }}</td>
-          <td>{{ produit.cosmos || '-' }}</td>
+          
+          <!-- SURLIGNAGE : Nom, Nom Scientifique, Fonction, Cosmos -->
+          <td><strong [innerHTML]="produit.nom | highlight:motTape"></strong></td>
+          <td [innerHTML]="produit.nomScientifique | highlight:motTape"></td>
+          <td [innerHTML]="(produit.fonction || 'Non défini') | highlight:motTape"></td>
+          <td [innerHTML]="(produit.cosmos || '-') | highlight:motTape"></td>
           
           <td>{{ produit.quantiteTotale || 0 }}</td>
           
@@ -55,7 +57,9 @@
                 </thead>
                 <tbody>
                   <tr *ngFor="let lot of produit.lots">
-                    <td>{{ lot.id }}</td>
+                    <!-- SURLIGNAGE : ID du lot (optionnel, mais pratique si on cherche un lot spécifique) -->
+                    <td><span [innerHTML]="lot.id | highlight:motTape"></span></td>
+                    
                     <td>{{ lot.quantite }}</td>
                     <td>{{ lot.poids }} kg</td>
                     <td>{{ lot.dateEntreeLot | date:'dd/MM/yyyy' }}</td>

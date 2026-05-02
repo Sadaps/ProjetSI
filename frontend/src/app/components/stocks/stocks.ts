@@ -1,25 +1,34 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Plus besoin de HttpClient ici !
 import { ProduitService } from '../../services/produit'; 
 import { Produit } from '../../models/produits.models';
 
+// 1. IMPORTS POUR LA RECHERCHE
+import { SearchService } from '../../search'; // Vérifie le chemin exact
+import { HighlightPipe } from '../../highlight-pipe'; // Vérifie le chemin exact
+
 @Component({
   selector: 'app-stocks',
-  standalone: true, // Ou "imports: [CommonModule]" selon ta config
-  imports: [CommonModule],
+  standalone: true, 
+  // 2. AJOUT DU HIGHLIGHTPIPE DANS LES IMPORTS
+  imports: [CommonModule, HighlightPipe],
   templateUrl: './stocks.html',
   styleUrl: './stocks.css',
 })
 export class Stocks implements OnInit {
-  produits: Produit[] = [];
+  produits: any[] = []; // (J'ai mis any[] pour éviter les erreurs TS avec quantiteTotale et isExpanded si non définis dans ton modèle Produit)
+
+  // 3. VARIABLE POUR STOCKER LE MOT RECHERCHÉ
+  motTape: string = '';
 
   constructor(
     private produitService: ProduitService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private searchService: SearchService // <-- 4. Injection du service de recherche
   ) {}
 
   ngOnInit(): void {
+    // A. Chargement des produits
     this.produitService.getProduits().subscribe({
       next: (data) => {
         const rawData = data.member || data['hydra:member'] || []; 
@@ -51,6 +60,13 @@ export class Stocks implements OnInit {
         this.cdr.detectChanges(); 
       },
       error: (err) => console.error('🚨 Erreur API :', err)
+    });
+
+    // B. Écoute de la barre de recherche globale (AJOUT)
+    this.searchService.currentSearch.subscribe(valeur => {
+      this.motTape = valeur;
+      this.cdr.markForCheck(); 
+      this.cdr.detectChanges(); 
     });
   }
 

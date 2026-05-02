@@ -1,25 +1,58 @@
 <div class="dashboard-container">
   <nav class="sidebar">
     <div class="logo">
-      <h2>StockPro</h2>
+      <h2><i class="bi bi-boxes"></i> StockPro</h2>
       <small>Gestion industrielle</small>
     </div>
     <ul class="nav-links">
-      <li class="active"><a routerLink="/tableaubord">Tableau de bord</a></li>
-      <li><a routerLink="/stocks">Gestion des stocks</a></li>
-      <li><a routerLink="/reception">Réception</a></li>
-      <li><a routerLink="/fournisseurs">Fournisseurs</a></li>
-      <li><a routerLink="/commandes">Commandes</a></li>
+      <li>
+        <a routerLink="/tableaubord" routerLinkActive="active">
+          <i class="bi bi-grid-1x2-fill icon"></i> Tableau de bord
+        </a>
+      </li>
+      <li>
+        <a routerLink="/stocks" routerLinkActive="active">
+          <i class="bi bi-archive-fill icon"></i> Gestion des stocks
+        </a>
+      </li>
+      <li>
+        <a routerLink="/reception" routerLinkActive="active">
+          <i class="bi bi-box-arrow-in-down icon"></i> Réception
+        </a>
+      </li>
+      <li>
+        <a routerLink="/fournisseurs" routerLinkActive="active">
+          <i class="bi bi-people-fill icon"></i> Fournisseurs
+        </a>
+      </li>
+      <li>
+        <a routerLink="/commandes" routerLinkActive="active">
+          <i class="bi bi-cart-fill icon"></i> Commandes
+        </a>
+      </li>
     </ul>
   </nav>
 
   <main class="content">
     <header class="top-bar">
-      <input type="text" placeholder="Rechercher un produit, lot...">
-      <div class="user-info">🔔 Jean Dupont</div>
+      <div class="search-bar">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" placeholder="Rechercher un produit, lot..." (input)="onSearch($event)">
+      </div>
+      <div class="user-profile">
+        <div class="bell-container">
+          <i class="bi bi-bell-fill bell"></i>
+          <span class="notification-dot"></span>
+        </div>
+        <div class="user-info">
+          <div class="avatar">JD</div>
+          <span class="user-name">Jean Dupont</span>
+        </div>
+      </div>
     </header>
 
-     <router-outlet></router-outlet>
-    
+    <div class="main-body">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>
