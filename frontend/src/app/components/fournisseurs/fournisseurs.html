@@ -1,176 +1,239 @@
 <div class="container p-4">
 
   <div class="row g-3 mb-4" *ngIf="!vueDetails">
-    <div class="col-md-4">
-      <div class="card p-3 shadow-sm border-0">
-        <div class="text-muted small">Fournisseurs Actifs</div>
-        <div class="h3 fw-bold text-success mb-0">3</div>
+    <div class="col-md-6">
+      <div class="card p-3 shadow-sm border-0 bg-light">
+        <div class="text-muted small uppercase fw-bold"><i class="bi bi-building me-2"></i>Total Fournisseurs</div>
+        <div class="h3 fw-bold text-success mb-0">{{ fournisseurs.length }}</div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card p-3 shadow-sm border-0">
-        <div class="text-muted small">Fournisseurs Suspendus</div>
-        <div class="h3 fw-bold text-danger mb-0">1</div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card p-3 shadow-sm border-0">
-        <div class="text-muted small">Total Contacts</div>
-        <div class="h3 fw-bold text-primary mb-0">5</div>
+    <div class="col-md-6">
+      <div class="card p-3 shadow-sm border-0 bg-light">
+        <div class="text-muted small uppercase fw-bold"><i class="bi bi-people me-2"></i>Total Contacts</div>
+        <div class="h3 fw-bold text-primary mb-0">{{ totalContactsGlobal }}</div>
       </div>
     </div>
   </div>
 
   <div *ngIf="vueDetails && fournisseurSelectionne">
-    <button class="btn btn-link text-decoration-none mb-3 p-0" (click)="retourListe()">
+    <button class="btn btn-sm btn-outline-secondary mb-3" (click)="retourListe()">
       <i class="bi bi-arrow-left"></i> Retour à la liste
     </button>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="h4 mb-0">{{ fournisseurSelectionne.nom }}</h2>
-      <span class="badge bg-success-subtle text-success">{{ fournisseurSelectionne.statut || 'Actif' }}</span>
-    </div>
-
     <div class="card border-0 shadow-sm p-4 mb-4">
+      <h2 class="h4 fw-bold text-dark mb-4 border-bottom pb-2">{{ fournisseurSelectionne.nom }}</h2>
       <div class="row">
         <div class="col-md-6 border-end">
           <p class="text-muted small mb-1"><i class="bi bi-geo-alt me-2"></i> Adresse</p>
           <p class="mb-0 fw-bold">{{ fournisseurSelectionne.adresse }}</p>
-          <p class="text-muted small">{{ fournisseurSelectionne.codePostal }} {{ fournisseurSelectionne.ville }}, {{ fournisseurSelectionne.pays }}</p>
+          <p class="text-muted small">{{ fournisseurSelectionne.codePostal }} {{ fournisseurSelectionne.ville }}, {{ fournisseurSelectionne.pays }} </p>
         </div>
-        <div class="col-md-3 border-end">
+        <div class="col-md-3 border-end text-center">
           <p class="text-muted small mb-1"><i class="bi bi-telephone me-2"></i> Téléphone</p>
-          <p class="fw-bold">{{ fournisseurSelectionne.telephone }}</p>
+          <p class="fw-bold">{{ fournisseurSelectionne.telephone || '-' }}</p>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 text-center">
           <p class="text-muted small mb-1"><i class="bi bi-envelope me-2"></i> Email</p>
-          <p class="text-primary fw-bold">{{ fournisseurSelectionne.mail || 'non renseigné' }}</p>
+          <p class="text-primary fw-bold text-truncate">{{ fournisseurSelectionne.mail || 'Non renseigné' }}</p>
         </div>
       </div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="showContactForm">
-      <div class="card-body">
-        <h6 class="fw-bold mb-3 text-primary">
+
+
+    // --- Coté contact avec le formualaire d'ajout/modification ---
+    <form #contactForm="ngForm" class="card border-0 shadow-sm mb-4 bg-white border-start border-primary border-4" *ngIf="showContactForm">
+      <div class="card-body p-4">
+        <h6 class="fw-bold mb-4 text-primary">
+          <i class="bi" [ngClass]="isEditingContact ? 'bi-pencil' : 'bi-person-plus'"></i>
           {{ isEditingContact ? 'Modifier le Contact' : 'Nouveau Contact' }}
         </h6>
-        <div class="row g-2">
-          <div class="col-md-6"><input type="text" class="form-control" placeholder="Prénom" [(ngModel)]="nouveauContact.prenom"></div>
-          <div class="col-md-6"><input type="text" class="form-control" placeholder="Nom" [(ngModel)]="nouveauContact.nom"></div>
-          <div class="col-md-6"><input type="email" class="form-control" placeholder="Email" [(ngModel)]="nouveauContact.mail"></div>
-          <div class="col-md-4"><input type="text" class="form-control" placeholder="Téléphone" [(ngModel)]="nouveauContact.telephone"></div>
-          
-          <div class="col-md-2">
-            <select class="form-select" [(ngModel)]="nouveauContact.statut">
+        
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Prénom</label>
+            <input type="text" name="cprenom" class="form-control" [(ngModel)]="nouveauContact.prenom">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Nom</label>
+            <input type="text" name="cnom" class="form-control" [(ngModel)]="nouveauContact.nom">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Email professionnel *</label>
+            <input type="email" name="cmail" class="form-control" [(ngModel)]="nouveauContact.mail" 
+                   #cmail="ngModel" required email [class.is-invalid]="cmail.invalid && cmail.touched">
+            <div class="invalid-feedback">Veuillez saisir un email valide.</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Téléphone direct</label>
+            <input type="text" name="ctel" class="form-control" [(ngModel)]="nouveauContact.telephone" 
+                   inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Fonction / Poste</label>
+            <select class="form-select" name="cfct" [(ngModel)]="nouveauContact.fonctionId">
+              <option [ngValue]="null">-- Choisir une fonction --</option>
+              <option *ngFor="let fct of fonctions" [ngValue]="fct.id">{{ fct.libelle }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Statut</label>
+            <select class="form-select" name="cstatut" [(ngModel)]="nouveauContact.statut">
               <option [ngValue]="true">Actif</option>
               <option [ngValue]="false">Inactif</option>
             </select>
           </div>
         </div>
-        <div class="mt-3 text-end">
-          <button class="btn btn-sm btn-outline-secondary me-2" (click)="annulerEdition()">Annuler</button>
-          <button *ngIf="!isEditingContact" class="btn btn-sm btn-primary" (click)="validerAjoutContact()">Enregistrer</button>
-          <button *ngIf="isEditingContact" class="btn btn-sm btn-success" (click)="validerModificationContact()">Appliquer les modifications</button>
+
+        <div class="mt-4 pt-3 border-top text-end">
+          <button type="button" class="btn btn-light me-2" (click)="annulerEdition()">Annuler</button>
+          <button type="submit" class="btn btn-primary px-4" [disabled]="contactForm.invalid"
+                  (click)="isEditingContact ? validerModificationContact() : validerAjoutContact()">
+            {{ isEditingContact ? 'Appliquer les modifications' : 'Enregistrer le contact' }}
+          </button>
         </div>
       </div>
-    </div>
+    </form>
+
+    //-- Liste des contacts associés au fournisseur sélectionné (avec le bouton pour ajouter ou annuler l'ajout) ---
 
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-        <h6 class="mb-0 fw-bold">Contacts</h6>
+        <h6 class="mb-0 fw-bold text-secondary">Liste des Contacts</h6>
         <button class="btn btn-primary btn-sm" (click)="showContactForm = !showContactForm; isEditingContact = false">
-          {{ showContactForm ? 'Fermer' : '+ Ajouter un contact' }}
+          <i class="bi" [ngClass]="showContactForm ? 'bi-x-lg' : 'bi-plus-lg'"></i>
+          {{ showContactForm ? 'Annuler' : 'Ajouter un contact' }}
         </button>
       </div>
       <div class="card-body p-0">
-        <div *ngFor="let c of fournisseurSelectionne.contact" class="p-3 border-bottom">
-          <div class="d-flex align-items-start">
-            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" 
-                 style="width: 45px; height: 45px; min-width: 45px;">
+        <div *ngFor="let c of fournisseurSelectionne.contact" class="p-3 border-bottom hover-bg">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 45px; height: 45px;">
               {{ c.prenom?.charAt(0) }}{{ c.nom?.charAt(0) }}
             </div>
-
             <div class="flex-grow-1">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <span class="fw-bold text-dark">{{ c.prenom }} {{ c.nom }}</span>
-                <div class="d-flex align-items-center gap-2">
-                  
-                  <span class="badge" 
-                        [ngClass]="c.statut === false ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'" 
-                        style="font-size: 0.7rem;">
-                    {{ c.statut ? 'Actif' : 'Inactif' }}
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="fw-bold d-block text-dark">{{ c.prenom }} {{ c.nom }}</span>
+                  <span class="badge bg-light text-secondary border small" *ngIf="c.fonction">
+                    <i class="bi bi-tag me-1"></i>{{ c.fonction.libelle }}
                   </span>
-                  
-                  <button class="btn btn-sm btn-outline-primary border-0" (click)="modifierContact(c)" title="Modifier">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-
-                  <button class="btn btn-sm btn-outline-danger border-0" (click)="supprimerContact(c.id)" title="Supprimer">
-                    <i class="bi bi-trash"></i>
-                  </button>
+                </div>
+                <div class="d-flex gap-2">
+                  <span class="badge rounded-pill" [style.background-color]="(c.statut == '1' || c.statut == true) ? '#d1e7dd' : '#f8d7da'" [style.color]="(c.statut == '1' || c.statut == true) ? '#0a3622' : '#842029'">
+                    {{ (c.statut == '1' || c.statut == true) ? 'Actif' : 'Inactif' }}
+                  </span>
+                  <button class="btn btn-sm btn-outline-primary" (click)="modifierContact(c)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="supprimerContact(c.id)"><i class="bi bi-trash"></i></button>
                 </div>
               </div>
-              <div class="row g-0">
-                <div class="col-md-6 text-muted small"><i class="bi bi-envelope me-1"></i> {{ c.mail || 'Pas d\'email' }}</div>
-                <div class="col-md-6 text-muted small"><i class="bi bi-telephone me-1"></i> {{ c.telephone || 'Pas de numéro' }}</div>
+              <div class="row g-0 mt-2">
+                <div class="col-md-6 text-muted small text-truncate"><i class="bi bi-envelope me-1"></i> {{ c.mail || '-' }}</div>
+                <div class="col-md-6 text-muted small"><i class="bi bi-telephone me-1"></i> {{ c.telephone || '-' }}</div>
               </div>
             </div>
           </div>
-        </div>
-        <div *ngIf="!fournisseurSelectionne.contact || fournisseurSelectionne.contact.length === 0" class="p-4 text-center text-muted small">
-          Aucun contact enregistré.
         </div>
       </div>
     </div>
   </div> 
 
+  // --- Formulaire d'ajout et de modification des fournisseurs + liste des fournisseurs ---
   <div *ngIf="!vueDetails">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h2 class="h4 mb-0">Fournisseurs</h2>
-        <p class="text-muted small">{{ fournisseurs.length }} fournisseur(s) affiché(s)</p>
+        <h2 class="h4 mb-0 fw-bold">Répertoire Fournisseurs</h2>
+        <p class="text-muted small mb-0">{{ fournisseurs.length }} entreprise(s) enregistrée(s)</p>
       </div>
-      <button class="btn btn-primary" (click)="showForm = !showForm">
-        {{ showForm ? 'Fermer' : '+ Ajouter un fournisseur' }}
+      <button class="btn btn-primary" (click)="showForm = !showForm; isEditingFournisseur = false">
+        <i class="bi" [ngClass]="showForm ? 'bi-x-lg' : 'bi-plus-lg'"></i>
+        {{ showForm ? 'Fermer' : 'Nouveau Fournisseur' }}
       </button>
     </div>
 
-    <div *ngIf="showForm" class="card shadow-sm border-0 mb-5">
+    <form #fournisseurForm="ngForm" *ngIf="showForm" class="card shadow-sm border-0 mb-5 border-start border-primary border-4">
       <div class="card-body p-4">
+        <h6 class="fw-bold mb-4 text-primary">
+          {{ isEditingFournisseur ? 'Modifier la fiche fournisseur' : 'Créer une fiche fournisseur' }}
+        </h6>
         <div class="row g-3">
-          <div class="col-12"><label class="small">Nom de l'entreprise *</label><input type="text" class="form-control" [(ngModel)]="nouveauFournisseur.nom"></div>
-          <div class="col-md-6"><label class="small">Téléphone</label><input type="text" class="form-control" [(ngModel)]="nouveauFournisseur.telephone"></div>
-          <div class="col-md-6"><label class="small">Email</label><input type="email" class="form-control" [(ngModel)]="nouveauFournisseur.mail"></div>
+          <div class="col-12">
+            <label class="form-label small fw-bold">Nom de l'entreprise *</label>
+            <input type="text" name="fnom" class="form-control" [(ngModel)]="nouveauFournisseur.nom" 
+                   #fnom="ngModel" required [class.is-invalid]="fnom.invalid && fnom.touched">
+          </div>
+          
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Téléphone Standard</label>
+            <input type="text" name="ftel" class="form-control" [(ngModel)]="nouveauFournisseur.telephone" 
+                   inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Email de contact *</label>
+            <input type="email" name="fmail" class="form-control" [(ngModel)]="nouveauFournisseur.mail" 
+                   #fmail="ngModel" required email [class.is-invalid]="fmail.invalid && fmail.touched">
+            <div class="invalid-feedback">Format email invalide.</div>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label small fw-bold">Adresse du siège</label>
+            <input type="text" name="fadr" class="form-control" [(ngModel)]="nouveauFournisseur.adresse">
+          </div>
+          
+          <div class="col-md-4">
+            <label class="form-label small fw-bold">Code Postal (5 car.)</label>
+            <input type="text" name="fcp" class="form-control" [(ngModel)]="nouveauFournisseur.codePostal" 
+                   #fcp="ngModel" maxlength="5" minlength="5" pattern="^[a-zA-Z0-9]{5}$" 
+                   [class.is-invalid]="fcp.invalid && fcp.touched">
+            <div class="invalid-feedback">Doit faire 5 caractères (ex: 20167 ou 2A123).</div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold">Ville</label>
+            <input type="text" name="fville" class="form-control" [(ngModel)]="nouveauFournisseur.ville">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-bold">Pays</label>
+            <input type="text" name="fpays" class="form-control" [(ngModel)]="nouveauFournisseur.pays">
+          </div>
         </div>
       </div>
-      <div class="card-footer bg-light text-end">
-        <button class="btn btn-outline-secondary me-2" (click)="showForm = false">Annuler</button>
-        <button class="btn btn-primary" (click)="validerAjout()">Enregistrer</button>
+      <div class="card-footer bg-light p-3 text-end">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="fermerFormulaireFournisseur()">Annuler</button>
+        <button type="submit" class="btn btn-primary px-4" [disabled]="fournisseurForm.invalid" (click)="validerAjout()">
+          {{ isEditingFournisseur ? 'Appliquer les modifications' : 'Enregistrer le fournisseur' }}
+        </button>
       </div>
-    </div>
+    </form>
 
     <div class="row g-4">
       <div class="col-12 col-md-6 col-lg-4" *ngFor="let f of fournisseurs">
-        <div class="card h-100 shadow-sm border-0 p-3 card-hover" (click)="voirDetails(f.id)" style="cursor: pointer;">
-          <div class="d-flex justify-content-between mb-2">
-            <div class="bg-primary-subtle p-2 rounded text-primary"><i class="bi bi-building"></i></div>
-            <span class="badge" [ngClass]="f.statut === 'Suspendu' ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'">
-              {{ f.statut || 'Actif' }}
-            </span>
+        <div class="card h-100 shadow-sm border-0 p-3 card-hover" style="cursor: pointer; transition: transform 0.2s;">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div (click)="voirDetails(f.id)" class="bg-primary-subtle p-3 rounded-3 text-primary">
+              <i class="bi bi-building h4 mb-0"></i>
+            </div>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm btn-white border text-primary" (click)="$event.stopPropagation(); modifierFournisseur(f)" title="Modifier"><i class="bi bi-pencil-square"></i></button>
+              <button class="btn btn-sm btn-white border text-danger" (click)="$event.stopPropagation(); supprimerFournisseur(f.id)" title="Supprimer"><i class="bi bi-trash"></i></button>
+            </div>
           </div>
-          <h5 class="fw-bold mb-1">{{ f.nom }}</h5>
-          <p class="text-muted small mb-3">{{ f.ville || 'Ville' }}, {{ f.pays || 'France' }}</p>
-          <div class="mt-auto border-top pt-2">
-            <span class="text-primary small fw-bold">Voir les détails →</span>
+          <div (click)="voirDetails(f.id)">
+            <h5 class="fw-bold text-dark mb-1">{{ f.nom }}</h5>
+            <p class="text-muted small mb-3"><i class="bi bi-geo-alt me-1"></i>{{ f.codePostal }} {{ f.ville || 'Ville non renseignée' }}</p>
+            <div class="mt-auto border-top pt-2 d-flex justify-content-between align-items-center">
+              <span class="text-primary small fw-bold">Fiche détaillée</span>
+              <i class="bi bi-chevron-right text-primary"></i>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div *ngIf="fournisseurs.length === 0" class="text-center py-5 text-muted">
-      <i class="bi bi-inbox h1 d-block mb-3"></i>
-      Aucun fournisseur trouvé.
+    <div *ngIf="fournisseurs.length === 0" class="text-center py-5 text-muted card border-0 shadow-sm mt-4">
+      <i class="bi bi-inbox h1 d-block mb-3 opacity-25"></i> 
+      <p class="mb-0">Aucun fournisseur trouvé dans la base de données.</p>
     </div>
   </div>
-
 </div>

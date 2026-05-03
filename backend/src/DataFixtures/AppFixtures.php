@@ -10,7 +10,7 @@ use App\Entity\Fonction;
 use App\Entity\Fournisseur;
 use App\Entity\FournisPar;
 use App\Entity\Produit;
-use App\Entity\Lots; // Assure-toi que ce use est là
+use App\Entity\Lots;
 use App\Entity\Inventaire;
 use App\Entity\VerifierLot;
 use App\Entity\Recu;
@@ -25,17 +25,49 @@ class AppFixtures extends Fixture
         $faker = Factory::create('fr_FR');
 
         // --- 1. BASES ---
+
+        // --- FONCTIONS --- Ajout des fonctions réaliste et d'une fonction "Autre" pour les cas non prévus
         $fonctionCom = new Fonction();
         $fonctionCom->setLibelle('Responsable Commercial');
         $manager->persist($fonctionCom);
+
+        $fonctionCompl = new Fonction();
+        $fonctionCompl->setLibelle('Responsable Logistique');
+        $manager->persist($fonctionCompl);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Responsable Technique');
+        $manager->persist($fonction);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Gestionnaire de Stock');
+        $manager->persist($fonction);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Assistant Administration des Ventes');
+        $manager->persist($fonction);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Responsable Production');
+        $manager->persist($fonction);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Agent de Transit');
+        $manager->persist($fonction);
+
+        $fonctionAutre = new Fonction();
+        $fonctionAutre->setLibelle('Autre');
+        $manager->persist($fonctionAutre);
+
 
         $catCosmetique = new Categorie();
         $catCosmetique->setNom('Cosmétique')->setDenomination('C');
         $manager->persist($catCosmetique);
 
         // --- 2. FOURNISSEUR ---
+
         $fournisseur = new Fournisseur();
-        $fournisseur->setNom('BioPlant France')->setTelephone('0102030405')->setAdresse('123 rue des Plantes, Paris');
+        $fournisseur->setNom('BioPlant France')->setTelephone('0102030405')->setAdresse('123 rue des Plantes')->setMail('info@bioplant.fr')->setPays('France')->setVille('Paris');
         $manager->persist($fournisseur);
 
         $contact = new Contact();
