@@ -1,1 +1,23 @@
-<p>commandes works!</p>
+<div class="commandes-dashboard">
+  <h2>Gestion des Commandes</h2>
+  <p class="subtitle">Sélectionnez l'action que vous souhaitez effectuer.</p>
+
+  <div class="cubes-container">
+    
+    <!-- CUBE 1 : NOUVELLE COMMANDE -->
+    <!-- (Le lien /commandes/nouvelle n'existe pas encore, on le créera juste après) -->
+    <a routerLink="/commandes/nouvelle" class="cube">
+      <div class="cube-icon">🛒</div>
+      <h3>Créer une commande</h3>
+      <p>Consulter les alertes de stock, choisir un fournisseur et passer une nouvelle commande.</p>
+    </a>
+
+    <!-- CUBE 2 : HISTORIQUE -->
+    <a routerLink="/commandes/historique" class="cube">
+      <div class="cube-icon">📋</div>
+      <h3>Historique des commandes</h3>
+      <p>Consulter les commandes passées, vérifier leurs statuts et faire des recherches.</p>
+    </a>
+
+  </div>
+</div>

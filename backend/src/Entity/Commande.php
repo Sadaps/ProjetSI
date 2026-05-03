@@ -10,38 +10,30 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource(normalizationContext: ['groups' => ['commande:read']])]
+#[ApiResource(normalizationContext: ['groups' => ['commande:read']],
+    denormalizationContext: ['groups' => ['commande:write']])]
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 class Commande
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['commande:read'])]
+    #[Groups(['commande:read', 'commande:write'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['commande:read'])]
+    #[Groups(['commande:read', 'commande:write'])]
     private ?\DateTime $date_commande = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2)]
-    #[Groups(['commande:read'])]
+    #[Groups(['commande:read', 'commande:write'])]
     private ?string $prix = null;
-
-    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    #[Groups(['produit:read'])]
-    private ?int $delai_min = null;
-
-    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    #[Groups(['produit:read'])]
-    private ?int $delai_max = null;
-
-    /**
-     * CETTE LIGNE MANQUAIT :
-     * @var Collection<int, Contenir>
-     */
-    #[ORM\OneToMany(targetEntity: Contenir::class, mappedBy: 'commande')]
-    #[Groups(['commande:read'])]
+    
+    /** 
+    *@var Collection<int, Contenir>
+    */
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: Contenir::class, cascade: ['persist'])]
+    #[Groups(['commande:read', 'commande:write'])]
     private Collection $contenir; 
 
     /**
@@ -51,11 +43,11 @@ class Commande
     private Collection $recus;
 
     #[ORM\ManyToOne(inversedBy: 'commandes')]
-    #[Groups(['commande:read'])]
+    #[Groups(['commande:read', 'commande:write'])]
     private ?Fournisseur $fournisseur = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['commande:read'])]
+    #[Groups(['commande:read', 'commande:write'])]
     private ?string $statut = null;
 
     public function __construct()
@@ -72,12 +64,6 @@ class Commande
 
     public function getPrix(): ?string { return $this->prix; }
     public function setPrix(string $prix): static { $this->prix = $prix; return $this; }
-
-    public function getDelaiMin(): ?int { return $this->delai_min; }
-    public function setDelaiMin(?int $delai_min): static { $this->delai_min = $delai_min; return $this; }
-
-    public function getDelaiMax(): ?int { return $this->delai_max; }
-    public function setDelaiMax(?int $delai_max): static { $this->delai_max = $delai_max; return $this; }
 
     /**
      * @return Collection<int, Contenir>

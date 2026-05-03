@@ -20,11 +20,11 @@ class FournisPar
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2)]
-    #[Groups(['produit:read', 'fournis_par:read'])]
+    #[Groups(['produit:read', 'fournis_par:read', 'commande:read'])]
     private ?string $prix = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2)]
-    #[Groups(['produit:read', 'fournis_par:read'])]
+    #[Groups(['produit:read', 'fournis_par:read', 'commande:read'])]
     private ?string $MOQ = null;
 
     #[ORM\ManyToOne(inversedBy: 'fournisPar')]
@@ -35,8 +35,16 @@ class FournisPar
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['produit:read', 'fournis_par:read'])]
+    #[Groups(['produit:read', 'fournis_par:read', 'commande:read'])]
     private ?Fournisseur $fournisseur = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['produit:read', 'commande:read'])]
+    private ?int $delai_min = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['produit:read', 'commande:read'])]
+    private ?int $delai_max = null;
 
     public function getId(): ?int { return $this->id; }
     public function getPrix(): ?string { return $this->prix; }
@@ -47,4 +55,28 @@ class FournisPar
     public function setProduit(?Produit $produit): static { $this->produit = $produit; return $this; }
     public function getFournisseur(): ?Fournisseur { return $this->fournisseur; }
     public function setFournisseur(?Fournisseur $fournisseur): static { $this->fournisseur = $fournisseur; return $this; }
+
+    public function getDelaiMin(): ?int
+    {
+        return $this->delai_min;
+    }
+
+    public function setDelaiMin(?int $delai_min): static
+    {
+        $this->delai_min = $delai_min;
+
+        return $this;
+    }
+
+    public function getDelaiMax(): ?int
+    {
+        return $this->delai_max;
+    }
+
+    public function setDelaiMax(?int $delai_max): static
+    {
+        $this->delai_max = $delai_max;
+
+        return $this;
+    }
 }

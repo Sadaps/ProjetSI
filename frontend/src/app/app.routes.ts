@@ -5,12 +5,16 @@ import { Commandes } from './components/commandes/commandes';
 import { Fournisseurs } from './components/fournisseurs/fournisseurs';
 import { Reception } from './components/reception/reception';
 import { Inventaires } from './components/inventaires/inventaires';
+import { Historique } from './components/commandes/historique/historique';
+import { NouvelleCommande } from './components/commandes/nouvelle-commande/nouvelle-commande';
 
 export const routes: Routes = [
   { path : '', redirectTo : 'tableaubord', pathMatch : 'full'}, 
   { path: 'tableaubord', component: Tableaubord },
   { path: 'stocks', component: Stocks },
   { path: 'commandes', component: Commandes },
+  { path: 'commandes/nouvelle', component: NouvelleCommande },
+  { path: 'commandes/historique', component: Historique },
   { path: 'fournisseurs', component: Fournisseurs },
   { path: 'reception', component: Reception },
   { path: 'inventaires', component: Inventaires },

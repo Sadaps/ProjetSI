@@ -1,28 +1,26 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // <-- Ajout de ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommandeService } from '../../services/commande'; 
 import { forkJoin, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
-
-// 1. IMPORTS POUR LA RECHERCHE
-import { SearchService } from '../../search'; // Vérifie le chemin
-import { HighlightPipe } from '../../highlight-pipe'; // Vérifie le chemin
+import { SearchService } from '../../search'; 
+import { HighlightPipe } from '../../highlight-pipe'; 
 
 interface LigneReception {
   produitIri: string;
   nomProduit: string;
   nomScientifique: string;
+  unite: string;          
   quantitePrevue: number;
   numeroLot: string;
-  poidsReel: number | null;
+  quantiteRecue: number;  
   datePeremption: string;
 }
 
 @Component({
   selector: 'app-reception',
   standalone: true,
-  // 2. AJOUT DU HIGHLIGHTPIPE DANS LES IMPORTS DU COMPOSANT
   imports: [CommonModule, FormsModule, HighlightPipe],
   templateUrl: './reception.html',
   styleUrl: './reception.css'
@@ -37,23 +35,22 @@ export class Reception implements OnInit {
   isLoading: boolean = true;
   isSubmitting: boolean = false;
 
-  // 3. VARIABLE POUR STOCKER LA RECHERCHE
   motTape: string = '';
 
   constructor(
     private commandeService: CommandeService, 
     private router: Router,
-    private searchService: SearchService, // <-- 4. Injection du SearchService
-    private cdr: ChangeDetectorRef        // <-- 5. Injection du ChangeDetectorRef
+    private searchService: SearchService,
+    private cdr: ChangeDetectorRef 
   ) {}
 
   ngOnInit() {
     this.commandeService.getCommandes().subscribe({
       next: (reponseApi) => {
         const toutesLesCommandes = reponseApi.member || reponseApi['hydra:member'] || [];
-        this.commandesEnAttente = toutesLesCommandes.filter((cmd: any) => cmd.statut !== 'Reçue');
-        console.log('Commandes chargées depuis Symfony :', this.commandesEnAttente);
+        this.commandesEnAttente = toutesLesCommandes.filter((cmd: any) => cmd.statut !== 'Reçue' && cmd.statut !== 'Annulée');
         this.isLoading = false; 
+        this.cdr.detectChanges();
       },
       error: (erreur) => {
         console.error('Erreur lors du chargement des commandes', erreur);
@@ -61,12 +58,25 @@ export class Reception implements OnInit {
       }
     });
 
-    // 6. ÉCOUTE DE LA BARRE DE RECHERCHE GLOBALE
     this.searchService.currentSearch.subscribe(valeur => {
       this.motTape = valeur;
       this.cdr.markForCheck(); 
       this.cdr.detectChanges(); 
     });
+  }
+
+  // --- NOUVELLE FONCTION MAGIQUE D'AFFICHAGE ---
+  afficherQuantiteFormatee(quantite: number, unite: string): string {
+    if (!quantite) return '0';
+    if (unite === 'kg') {
+      return (quantite * 1000).toLocaleString('fr-FR') + ' g';
+    } else if (unite === 'ml' || unite === 'liquide') {
+      return quantite.toLocaleString('fr-FR') + ' ml';
+    } else if (unite === 'g') {
+      return quantite.toLocaleString('fr-FR') + ' g';
+    } else {
+      return quantite.toLocaleString('fr-FR') + ' pce(s)';
+    }
   }
 
   onCommandeChange() {
@@ -80,18 +90,20 @@ export class Reception implements OnInit {
         produitIri: item.produit['@id'], 
         nomProduit: item.produit.nom,
         nomScientifique: item.produit.nomScientifique,
+        unite: item.produit.unite || 'unité', // Récupère l'unité depuis le back-end
         quantitePrevue: item.quantite,
         numeroLot: '',
-        poidsReel: item.poids_attendu ? parseFloat(item.poids_attendu) : null, 
+        quantiteRecue: item.quantite, // On pré-remplit avec la quantité prévue pour faire gagner du temps !
         datePeremption: ''
       };
     });
   }
 
   validerReception() {
-    const formulaireIncomplet = this.lignesLots.some(ligne => !ligne.datePeremption);
+    // On vérifie que le N° Lot ET la péremption sont remplis
+    const formulaireIncomplet = this.lignesLots.some(ligne => !ligne.datePeremption || !ligne.numeroLot);
     if (formulaireIncomplet) {
-      alert("Veuillez remplir toutes les dates de péremption !");
+      alert("Veuillez remplir tous les numéros de lots et les dates de péremption !");
       return;
     }
 
@@ -99,20 +111,22 @@ export class Reception implements OnInit {
     this.isSubmitting = true;
 
     const missions = this.lignesLots.map(ligne => {
+      // 1. Création du lot avec la nouvelle structure
       const nouveauLot = {
         produit: ligne.produitIri, 
-        quantite: ligne.quantitePrevue,
-        poids: ligne.poidsReel !== null ? ligne.poidsReel.toString() : null,
+        contenanceRestante: ligne.quantiteRecue, 
+        numeroLot: ligne.numeroLot,              
         datePeremption: ligne.datePeremption,
         dateEntreeLot: this.dateReception
       };
 
       return this.commandeService.creerLot(nouveauLot).pipe(
         switchMap((lotCree: any) => {
+          // 2. Création du reçu (historique de la transaction)
           const nouveauRecu = {
             commande: `/api/commandes/${this.selectedCommande.id}`,
             lot: lotCree['@id'], 
-            quantite: ligne.quantitePrevue,
+            quantite: ligne.quantiteRecue,
             date_reception: this.dateReception,
             notes: this.notes
           };
@@ -122,7 +136,7 @@ export class Reception implements OnInit {
     });
 
     forkJoin(missions).subscribe({
-      next: (resultats) => {
+      next: () => {
         this.commandeService.changerStatutCommande(this.selectedCommande.id, 'Reçue').subscribe({
           next: () => {
             alert('🎉 Réception validée et commande clôturée !');
