@@ -20,14 +20,6 @@ class Lots
     #[Groups(['produit:read'])]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2, nullable: true)]
-    #[Groups(['produit:read'])]
-    private ?string $poids = null;
-
-    #[ORM\Column]
-    #[Groups(['produit:read'])]
-    private ?int $quantite = null;
-
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Groups(['produit:read'])]
     private ?\DateTime $datePeremption = null;
@@ -38,15 +30,10 @@ class Lots
 
     #[ORM\ManyToOne(inversedBy: 'lots')]
     #[ORM\JoinColumn(nullable: false)]
-    // PAS de Groups ici pour éviter la boucle infinie vers Produit
     private ?Produit $produit = null;
-
-   /**
-     * @var Collection<int, VerifierLot>
-     */
-    #[ORM\OneToMany(targetEntity: VerifierLot::class, mappedBy: 'lot')]
+    #[ORM\Column(length: 255)]
     #[Groups(['produit:read'])] 
-    private Collection $verifierLot;
+    private ?string $numeroLot = null;
 
    /**
      * @var Collection<int, Recu>
@@ -55,6 +42,10 @@ class Lots
     #[Groups(['produit:read'])] // <-- Indispensable ici
     private Collection $recus;
 
+    #[ORM\Column(type: 'float')]
+    #[Groups(['produit:read'])]
+    private ?float $contenanceRestante = null;
+
     public function __construct()
     {
         $this->verifierLot = new ArrayCollection();
@@ -62,12 +53,6 @@ class Lots
     }
 
     public function getId(): ?int { return $this->id; }
-
-    public function getPoids(): ?string { return $this->poids; }
-    public function setPoids(?string $poids): static { $this->poids = $poids; return $this; }
-
-    public function getQuantite(): ?int { return $this->quantite; }
-    public function setQuantite(int $quantite): static { $this->quantite = $quantite; return $this; }
 
     public function getDatePeremption(): ?\DateTime { return $this->datePeremption; }
     public function setDatePeremption(\DateTime $datePeremption): static { $this->datePeremption = $datePeremption; return $this; }
@@ -81,4 +66,23 @@ class Lots
     public function getVerifierLot(): Collection { return $this->verifierLot; }
 
     public function getRecus(): Collection { return $this->recus; }
+    public function getContenanceRestante(): ?float
+    {
+        return $this->contenanceRestante;
+    }
+
+    public function setContenanceRestante(float $contenanceRestante): static
+    {
+        $this->contenanceRestante = $contenanceRestante;
+        return $this;
+    }
+    public function getNumeroLot(): ?string
+    {
+        return $this->numeroLot;
+    }
+    public function setNumeroLot(string $numeroLot): static
+    {
+        $this->numeroLot = $numeroLot;
+        return $this;
+    }
 }

@@ -1,0 +1,112 @@
+<div class="page-container">
+  <div class="header-section">
+    <h2>Historique des commandes</h2>
+
+    <div class="filtre-statut">
+      <label>Filtrer par statut :</label>
+      <select [(ngModel)]="statutSelectionne" (change)="appliquerFiltres()" class="form-control">
+        <option value="">Tous les statuts</option>
+        <option value="En attente">⏳ En attente</option>
+        <option value="Reçue">✅ Reçue</option>
+        <option value="Annulée">❌ Annulée</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="alert alert-info">
+    ⏳ Chargement de l'historique des commandes...
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <div class="table-card" *ngIf="commandesAffichees.length > 0">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>N° Commande</th>
+            <th>Date</th>
+            <th>Fournisseur</th>
+            <th>Délai (jours)</th>
+            <th>Montant</th>
+            <th>Statut</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cmd of commandesAffichees">
+            <td><strong>#{{ cmd.id }}</strong></td>
+            <td>{{ cmd.date_commande | date:'dd/MM/yyyy' }}</td>
+            <td>{{ cmd.fournisseur?.nom }}</td>
+            <td>{{ calculerDelaiCommande(cmd) }}</td>
+            <td>{{ cmd.prix }} €</td>
+            <td>
+              <span class="badge"
+                    [ngClass]="{
+                      'badge-attente': cmd.statut === 'En attente',
+                      'badge-recue': cmd.statut === 'Reçue',
+                      'badge-annulee': cmd.statut === 'Annulée'
+                    }">
+                {{ cmd.statut }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-detail" (click)="ouvrirDetail(cmd)">Voir détails</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="commandesAffichees.length === 0" class="alert alert-warning mt-3">
+      Aucune commande ne correspond à vos critères de recherche.
+    </div>
+  </ng-container>
+</div>
+
+<!-- Fenêtre de détails (Overlay) -->
+<div class="modal-overlay" *ngIf="commandeSelectionnee" (click)="fermerDetail()">
+  <div class="detail-card" (click)="$event.stopPropagation()">
+    <div class="detail-header">
+      <h3>Détails de la Commande #{{ commandeSelectionnee.id }}</h3>
+      <button class="close-btn" (click)="fermerDetail()">×</button>
+    </div>
+
+    <div class="detail-info">
+      <p>📅 Commande du <strong>{{ commandeSelectionnee.date_commande | date:'dd/MM/yyyy' }}</strong></p>
+      <p>🏢 Fournisseur : <strong>{{ commandeSelectionnee.fournisseur.nom }}</strong></p>
+    </div>
+
+    <table class="table-detail">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Quantité commandée</th> 
+          <th>Prix Unit.</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ligne of commandeSelectionnee.contenir">
+          <td>{{ ligne.produit.nom }}</td>
+          
+          <td><strong>{{ afficherQuantiteFormatee(ligne) }}</strong></td>
+          
+          <!-- Ajout dynamique de /kg ou /L pour plus de clarté -->
+          <td>
+            {{ getPrixUnitaire(ligne, commandeSelectionnee.fournisseur['@id']) | number:'1.2-2' }} €
+            <span *ngIf="ligne.produit.unite === 'g'">/kg</span>
+            <span *ngIf="ligne.produit.unite === 'ml'">/L</span>
+          </td>
+          
+          <!-- 👇 Appel de la nouvelle fonction pour le calcul du total de la ligne 👇 -->
+          <td>{{ calculerTotalLigne(ligne, commandeSelectionnee.fournisseur['@id']) | number:'1.2-2' }} €</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="text-align: right;"><strong>TOTAL RÉEL :</strong></td>
+          <td class="total-final">{{ commandeSelectionnee.prix }} €</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

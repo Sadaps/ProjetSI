@@ -1,0 +1,61 @@
+.commandes-dashboard {
+  padding: 2rem;
+}
+
+.subtitle {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.cubes-container {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap; /* Pratique si l'écran est petit */
+}
+
+/* Le design du cube */
+.cube {
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+  background-color: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  text-decoration: none; /* Enlève le souligné du lien */
+  color: inherit;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease; /* Pour l'animation de survol */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* L'effet magique au passage de la souris */
+.cube:hover {
+  transform: translateY(-8px); /* Fait "monter" le cube */
+  box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1);
+  border-color: #4338ca; /* Le contour prend la couleur de ton application */
+}
+
+.cube-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.cube h3 {
+  margin: 0 0 1rem 0;
+  color: #111827;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.cube p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}

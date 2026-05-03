@@ -42,6 +42,7 @@ class Produit
      * @var Collection<int, FournisPar>
      */
     #[ORM\OneToMany(targetEntity: FournisPar::class, mappedBy: 'produit')]
+    #[Groups(['produit:read', 'commande:read'])]
     private Collection $fournisPar;
 
     /**
@@ -56,6 +57,15 @@ class Produit
      */
     #[ORM\OneToMany(targetEntity: Contenir::class, mappedBy: 'produit')]
     private Collection $contenir;
+
+#[ORM\Column(type: 'float', options: ['default' => 0])]    
+#[Groups(['produit:read', 'contenir:read', 'commande:read'])]
+    private ?float $quantiteTotale = 0;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['produit:read', 'contenir:read', 'commande:read'])]
+    private ?string $unite = null;
+
 
     public function __construct()
     {
@@ -203,6 +213,30 @@ class Produit
                 $contenir->setProduit(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getQuantiteTotale(): ?float
+    {
+        return $this->quantiteTotale;
+    }
+
+    public function setQuantiteTotale(float $quantiteTotale): static
+    {
+        $this->quantiteTotale = $quantiteTotale;
+
+        return $this;
+    }
+
+    public function getUnite(): ?string
+    {
+        return $this->unite;
+    }
+
+    public function setUnite(?string $unite): static
+    {
+        $this->unite = $unite;
 
         return $this;
     }

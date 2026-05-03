@@ -1,0 +1,134 @@
+<div class="page-container">
+  
+  <div class="header-section">
+    <h2>Créer une commande</h2>
+    <p class="subtitle">Consultez les alertes et passez commande auprès de vos fournisseurs.</p>
+  </div>
+
+  <!-- Sablier de chargement -->
+  <div *ngIf="isLoading" class="alert alert-info">
+    ⏳ Chargement des produits et des fournisseurs...
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    
+    <!-- ========================================== -->
+    <!-- SECTION 1 : ALERTES DE STOCK               -->
+    <!-- ========================================== -->
+    <div class="card alert-card">
+      <div class="card-header border-orange">
+        <h3>⚠️ Produits en alerte (Seuil : {{ seuilAlerte }})</h3>
+      </div>
+      
+      <div class="card-body">
+        <!-- S'il y a des alertes -->
+        <table class="table" *ngIf="produitsEnAlerte.length > 0">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Nom Scientifique</th>
+              <th>Stock Actuel</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of produitsEnAlerte">
+              <td><strong>{{ p.nom }}</strong></td>
+              <td class="text-italic text-muted">{{ p.nomScientifique }}</td>
+              <td>
+                <span class="stock-badge" [ngClass]="{'stock-critique': p.quantiteTotale === 0, 'stock-bas': p.quantiteTotale > 0}">
+                  {{ p.quantiteTotale }} unités
+                </span>
+              </td>
+              <td>À commander d'urgence</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Si tout va bien -->
+        <div *ngIf="produitsEnAlerte.length === 0" class="alert alert-success">
+          ✅ Aucun produit en dessous du seuil d'alerte. Vos stocks sont bons !
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2 : FORMULAIRE DE COMMANDE         -->
+    <!-- ========================================== -->
+    <div class="card form-card">
+      <div class="card-header border-blue">
+        <h3>🛒 Formulaire de commande</h3>
+      </div>
+
+      <div class="card-body">
+        <!-- Choix du fournisseur -->
+        <div class="form-group fournisseur-select">
+          <label for="fournisseur">1. Sélectionnez un fournisseur :</label>
+          <select id="fournisseur" [(ngModel)]="fournisseurSelectionne" (ngModelChange)="onFournisseurChange()" class="form-control form-select-lg">
+            <option [ngValue]="null">-- Choisir un fournisseur --</option>
+            <option *ngFor="let f of fournisseurs" [ngValue]="f">
+              {{ f.nom }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Lignes de commande (s'affichent uniquement si un fournisseur est choisi) -->
+        <div *ngIf="fournisseurSelectionne" class="lignes-commande-section">
+          <label>2. Ajoutez vos produits :</label>
+          
+          <div class="ligne-commande" *ngFor="let ligne of lignesCommande; let i = index">
+            
+            <div class="champ-produit">
+              <select [(ngModel)]="ligne.produitSelectionne" (ngModelChange)="onProduitChange(ligne)" class="form-control">
+                <option [ngValue]="null">-- Choisir un produit --</option>
+                <option *ngFor="let p of produitsDuFournisseur" [ngValue]="p">
+                  {{ p.nom }} (Stock: {{ p.quantiteTotale }})
+                </option>
+              </select>
+              
+              <!-- NOUVEAU : Affichage intelligent des textes (kg, L ou Unités) -->
+              <small *ngIf="ligne.produitSelectionne" class="text-muted" style="display: block; margin-top: 4px;">
+                Quantité Min (MOQ) : {{ getAffichageMoq(ligne) }} | {{ getTextePrixUnitaire(ligne) }} : {{ ligne.prixUnitaire }} €
+              </small>
+            </div>
+
+            <div class="champ-quantite">
+              <!-- NOUVEAU : On lie au moqAffichee, quantiteAffichee, et on autorise les virgules avec step -->
+              <input type="number" 
+                     step="0.01" 
+                     [(ngModel)]="ligne.quantiteAffichee" 
+                     [min]="ligne.moqAffichee" 
+                     class="form-control" 
+                     placeholder="Qté">
+            </div>
+            <div class="champ-action">
+              <button class="btn-icon btn-danger" (click)="supprimerLigneCommande(i)" title="Supprimer la ligne">
+                🗑️
+              </button>
+            </div>
+            
+          </div>
+
+          <!-- Affichage du Prix Total -->
+          <div class="total-commande" *ngIf="lignesCommande.length > 0 && lignesCommande[0].produitSelectionne">
+            <h4 style="text-align: right; color: #4338ca; margin-bottom: 1rem;">
+              Total estimé : <strong>{{ calculerPrixTotal() | number:'1.2-2' }} €</strong>
+            </h4>
+          </div>
+
+          <!-- Boutons d'action du formulaire -->
+          <div class="form-actions">
+            <button class="btn btn-secondary" (click)="ajouterLigneCommande()">
+              + Ajouter une ligne
+            </button>
+            <button class="btn btn-primary" (click)="validerCommande()" [disabled]="isSubmitting || lignesCommande.length === 0 || !lignesCommande[0].produitSelectionne">
+              Vérifier et Valider la commande
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>

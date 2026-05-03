@@ -1,0 +1,161 @@
+.page-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  margin-bottom: 2rem;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* Design des cartes (Cards) */
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1.5rem 2rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.card-header.border-orange { border-left: 5px solid #f97316; }
+.card-header.border-blue { border-left: 5px solid #4338ca; }
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+/* Alertes de Stock */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.text-italic { font-style: italic; }
+.text-muted { color: #6b7280; }
+
+.stock-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.stock-critique { background-color: #fee2e2; color: #b91c1c; } /* Rouge si 0 */
+.stock-bas { background-color: #ffedd5; color: #c2410c; }     /* Orange si < seuil */
+
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+.alert-info { background-color: #e0f2fe; color: #0369a1; }
+.alert-success { background-color: #d1fae5; color: #065f46; }
+
+/* Formulaire */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.form-select-lg {
+  font-size: 1.1rem;
+  padding: 1rem;
+  border-color: #4338ca;
+  background-color: #f5f3ff;
+}
+
+/* Grille des lignes de commande */
+.lignes-commande-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ligne-commande {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+}
+
+.champ-produit { flex: 3; }
+.champ-quantite { flex: 1; min-width: 100px; }
+.champ-action { flex: 0; }
+
+/* Boutons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary { background-color: #4338ca; color: white; }
+.btn-primary:hover:not(:disabled) { background-color: #3730a3; }
+
+.btn-secondary { background-color: #e5e7eb; color: #374151; }
+.btn-secondary:hover { background-color: #d1d5db; }
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+.btn-danger:hover { background-color: #fee2e2; }
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
