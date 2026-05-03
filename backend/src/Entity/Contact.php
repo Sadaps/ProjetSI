@@ -2,55 +2,54 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ContactRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['contact:read']]
+)]
 #[ORM\Entity(repositoryClass: ContactRepository::class)]
 class Contact
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['fournisseur:read'])]
+    #[Groups(['contact:read', 'fournisseur:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['fournisseur:read'])]
+    #[Groups(['contact:read', 'fournisseur:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['fournisseur:read'])]
+    #[Groups(['contact:read', 'fournisseur:read'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['fournisseur:read'])]
+    #[Groups(['contact:read', 'fournisseur:read'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['fournisseur:read'])]
+    #[Groups(['contact:read', 'fournisseur:read'])]
     private ?string $mail = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['fournisseur:read'])]
+    #[Groups(['contact:read', 'fournisseur:read'])]
     private ?string $statut = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['fournisseur:read'])]
-    private ?\DateTime $date_maj = null;
+    #[Groups(['contact:read'])]
+    private ?\DateTimeInterface $date_maj = null;
 
     #[ORM\ManyToOne(inversedBy: 'contact')]
-    #[Groups(['fournisseur:read'])]
+    #[Groups(['contact:read', 'fournisseur:read'])]
     private ?Fonction $fonction = null;
 
     #[ORM\ManyToOne(inversedBy: 'contact')]
     #[ORM\JoinColumn(nullable: false)]
-    /** * ON NE MET PAS de Groups ici. 
-     * C'est ce qui empêche Contact de re-sérialiser Fournisseur.
-     */
     private ?Fournisseur $fournisseur = null;
 
     public function getId(): ?int { return $this->id; }
@@ -70,8 +69,8 @@ class Contact
     public function getStatut(): ?string { return $this->statut; }
     public function setStatut(?string $statut): static { $this->statut = $statut; return $this; }
 
-    public function getDateMaj(): ?\DateTime { return $this->date_maj; }
-    public function setDateMaj(?\DateTime $date_maj): static { $this->date_maj = $date_maj; return $this; }
+    public function getDateMaj(): ?\DateTimeInterface { return $this->date_maj; }
+    public function setDateMaj(?\DateTimeInterface $date_maj): static { $this->date_maj = $date_maj; return $this; }
 
     public function getFonction(): ?Fonction { return $this->fonction; }
     public function setFonction(?Fonction $fonction): static { $this->fonction = $fonction; return $this; }

@@ -33,9 +33,27 @@ class Fournisseur
     #[Groups(['fournisseur:read'])]
     private ?string $adresse = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['fournisseur:read'])]
+    private ?string $mail = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['fournisseur:read'])]
+    private ?string $pays = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['fournisseur:read'])]
+    private ?string $ville = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['fournisseur:read'])]
+    private ?string $codePostal = null;
+
+
     #[ORM\OneToMany(targetEntity: Contact::class, mappedBy: 'fournisseur')]
     #[Groups(['fournisseur:read'])]
     private Collection $contact;
+    
 
     /**
      * @var Collection<int, FournisPar>
@@ -93,6 +111,54 @@ class Fournisseur
     public function setAdresse(?string $adresse): static
     {
         $this->adresse = $adresse;
+
+        return $this;
+    }
+
+    public function getMail(): ?string
+    {
+        return $this->mail;
+    }
+
+    public function setMail(?string $mail): static
+    {
+        $this->mail = $mail;
+
+        return $this;
+    }
+
+    public function getPays(): ?string
+    {
+        return $this->pays;
+    }
+
+    public function setPays(?string $pays): static
+    {
+        $this->pays = $pays;
+
+        return $this;
+    }
+    
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(?string $ville): static
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->codePostal;
+    }
+
+    public function setCodePostal(?string $codePostal): static
+    {
+        $this->codePostal = $codePostal;
 
         return $this;
     }
@@ -186,4 +252,5 @@ class Fournisseur
 
         return $this;
     }
+    
 }

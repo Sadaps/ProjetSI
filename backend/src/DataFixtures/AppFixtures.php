@@ -29,12 +29,46 @@ class AppFixtures extends Fixture
         $fonctionCom->setLibelle('Responsable Commercial');
         $manager->persist($fonctionCom);
 
+        $fonctionCompl = new Fonction();
+        $fonctionCompl->setLibelle('Responsable Logistique');
+        $manager->persist($fonctionCompl);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Responsable Technique');
+        $manager->persist($fonction);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Gestionnaire de Stock');
+        $manager->persist($fonction);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Assistant Administration des Ventes');
+        $manager->persist($fonction);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Responsable Production');
+        $manager->persist($fonction);
+
+        $fonction = new Fonction();
+        $fonction->setLibelle('Agent de Transit');
+        $manager->persist($fonction);
+
+        $fonctionAutre = new Fonction();
+        $fonctionAutre->setLibelle('Autre');
+        $manager->persist($fonctionAutre);
+
+
         $catCosmetique = new Categorie();
         $catCosmetique->setNom('Cosmétique')->setDenomination('C');
         $manager->persist($catCosmetique);
 
         // --- 2. FOURNISSEURS ET CONTACTS AVEC FAKER ---
         $fournisseursReferences = []; 
+        // --- 2. FOURNISSEUR ---
+
+        $fournisseur = new Fournisseur();
+        $fournisseur->setNom('BioPlant France')->setTelephone('0102030405')->setAdresse('123 rue des Plantes')->setMail('info@bioplant.fr')->setPays('France')->setVille('Paris');
+        $manager->persist($fournisseur);
 
         for ($i = 0; $i < 5; $i++) {
             $fournisseur = new Fournisseur();

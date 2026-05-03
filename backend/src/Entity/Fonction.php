@@ -6,18 +6,26 @@ use App\Repository\FonctionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: FonctionRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['fonction:read']],
+    denormalizationContext: ['groups' => ['fonction:write']]
+)]
 class Fonction
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['contact:read', 'fournisseur:read', 'fonction:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['contact:read', 'fournisseur:read', 'fonction:read'])]
     private ?string $libelle = null;
-
+    
     /**
      * @var Collection<int, Contact>
      */
