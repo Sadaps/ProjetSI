@@ -42,13 +42,6 @@ class Lots
     private ?Produit $produit = null;
 
    /**
-     * @var Collection<int, VerifierLot>
-     */
-    #[ORM\OneToMany(targetEntity: VerifierLot::class, mappedBy: 'lot')]
-    #[Groups(['produit:read'])] 
-    private Collection $verifierLot;
-
-   /**
      * @var Collection<int, Recu>
      */
     #[ORM\OneToMany(targetEntity: Recu::class, mappedBy: 'lot')]
@@ -57,7 +50,6 @@ class Lots
 
     public function __construct()
     {
-        $this->verifierLot = new ArrayCollection();
         $this->recus = new ArrayCollection();
     }
 
@@ -77,8 +69,6 @@ class Lots
 
     public function getProduit(): ?Produit { return $this->produit; }
     public function setProduit(?Produit $produit): static { $this->produit = $produit; return $this; }
-
-    public function getVerifierLot(): Collection { return $this->verifierLot; }
 
     public function getRecus(): Collection { return $this->recus; }
 }

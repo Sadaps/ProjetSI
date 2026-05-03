@@ -5,6 +5,14 @@
     <p>⏳ Chargement des produits en cours...</p>
   </div>
 
+  <div class="stocks-container">
+  <div class="header-actions" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="buttons-group">
+      <button (click)="consulterInventaires()" class="btn-secondary">Consulter les inventaires</button>
+      <button (click)="creerNouvelInventaire()" class="btn-primary">Créer un nouvel inventaire</button>
+    </div>
+  </div>
+
   <table *ngIf="produits.length > 0" class="stock-table">
     <thead>
       <tr>

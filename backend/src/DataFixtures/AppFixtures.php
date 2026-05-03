@@ -10,9 +10,9 @@ use App\Entity\Fonction;
 use App\Entity\Fournisseur;
 use App\Entity\FournisPar;
 use App\Entity\Produit;
-use App\Entity\Lots; // Assure-toi que ce use est là
+use App\Entity\Lots;
 use App\Entity\Inventaire;
-use App\Entity\VerifierLot;
+use App\Entity\LigneInventaire;
 use App\Entity\Recu;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -34,41 +34,34 @@ class AppFixtures extends Fixture
         $manager->persist($catCosmetique);
 
         // --- 2. FOURNISSEURS ET CONTACTS AVEC FAKER ---
+        $fournisseursReferences = []; 
 
-// On prépare une boîte (un tableau) pour stocker nos fournisseurs créés
-$fournisseursReferences = []; 
+        for ($i = 0; $i < 5; $i++) {
+            $fournisseur = new Fournisseur();
+            
+            // On coupe à 50 caractères max pour éviter l'erreur SQL
+            $fournisseur->setNom(substr($faker->company(), 0, 50))
+                        ->setTelephone(substr($faker->phoneNumber(), 0, 50))
+                        ->setAdresse(substr($faker->address(), 0, 50));
+                        
+            $manager->persist($fournisseur);
+            $fournisseursReferences[] = $fournisseur;
 
-// Créons 5 fournisseurs aléatoires
-for ($i = 0; $i < 5; $i++) {
-    $fournisseur = new Fournisseur();
-    
-    // Faker génère de vrais noms d'entreprises, téléphones et adresses françaises
-    $fournisseur->setNom($faker->company())
-                ->setTelephone($faker->phoneNumber())
-                ->setAdresse($faker->address());
-                
-    $manager->persist($fournisseur);
-    
-    // On sauvegarde ce fournisseur dans notre tableau pour l'utiliser plus tard dans les commandes
-    $fournisseursReferences[] = $fournisseur;
+            $nombreDeContacts = $faker->numberBetween(1, 3);
+            
+            for ($k = 0; $k < $nombreDeContacts; $k++) {
+                $contact = new Contact();
+                $contact->setNom(substr($faker->lastName(), 0, 50))
+                        ->setPrenom(substr($faker->firstName(), 0, 50))
+                        ->setMail(substr($faker->companyEmail(), 0, 50)) 
+                        ->setFonction($fonctionCom)
+                        ->setFournisseur($fournisseur);
+                        
+                $manager->persist($contact);
+            }
+        }
 
-    // Pour CHAQUE fournisseur, on crée entre 1 et 3 contacts
-    $nombreDeContacts = $faker->numberBetween(1, 3);
-    
-    for ($k = 0; $k < $nombreDeContacts; $k++) {
-        $contact = new Contact();
-        $contact->setNom($faker->lastName())
-                ->setPrenom($faker->firstName())
-                // companyEmail génère une adresse mail basée sur le nom généré
-                ->setMail($faker->companyEmail()) 
-                ->setFonction($fonctionCom) // Assure-toi que $fonctionCom est bien créé juste avant !
-                ->setFournisseur($fournisseur);
-                
-        $manager->persist($contact);
-    }
-}
-
-        // --- 3. PRODUITS + LOTS (MODIFIÉ POUR PLUSIEURS LOTS) ---
+        // --- 3. PRODUITS + LOTS ---
         $vraisProduitsData = [
             ['nom' => 'Huile d\'Amande Douce', 'sci' => 'Prunus Amygdalus Dulcis Oil', 'fonc' => 'Émollient'],
             ['nom' => 'Charbon Actif', 'sci' => 'Carbo Vegetabilis', 'fonc' => 'Purifiant'],
@@ -81,8 +74,10 @@ for ($i = 0; $i < 5; $i++) {
 
         foreach ($vraisProduitsData as $data) {
             $produit = new Produit();
-            $produit->setNom($data['nom'])->setNomScientifique($data['sci'])
-                    ->setFonction($data['fonc'])->setCosmos('Certifié COSMOS Organic');
+            $produit->setNom(substr($data['nom'], 0, 50))
+                    ->setNomScientifique(substr($data['sci'], 0, 50))
+                    ->setFonction(substr($data['fonc'], 0, 50))
+                    ->setCosmos('Certifié COSMOS Organic');
             
             if (method_exists($produit, 'setCategorie')) {
                 $produit->setCategorie($catCosmetique);
@@ -91,20 +86,17 @@ for ($i = 0; $i < 5; $i++) {
             $manager->persist($produit);
             $produitsReferences[] = $produit;
 
-            // Liaison Fournisseur
             $fournisPar = new FournisPar();
             $fournisPar->setProduit($produit)->setFournisseur($fournisseur)
                        ->setPrix($faker->randomFloat(2, 5, 50))->setMOQ($faker->randomFloat(2, 1, 10));
             $manager->persist($fournisPar);
 
-            // --- ICI : GÉNÉRATION DE 2 À 5 LOTS PAR PRODUIT ---
             $nbLots = $faker->numberBetween(2, 5);
             for ($j = 0; $j < $nbLots; $j++) {
                 $lot = new Lots();
                 $lot->setPoids($faker->randomFloat(2, 5, 100))
                     ->setQuantite($faker->numberBetween(10, 100))
                     ->setDatePeremption($faker->dateTimeBetween('+1 year', '+3 years'))
-                    // On décale un peu les dates d'entrée pour le réalisme
                     ->setDateEntreeLot($faker->dateTimeBetween('-1 month', 'now'))
                     ->setProduit($produit);
                 
@@ -116,9 +108,9 @@ for ($i = 0; $i < 5; $i++) {
         // --- 4. FAKER PRODUITS ---
         for ($i = 0; $i < 10; $i++) {
             $produitAlea = new Produit();
-            $produitAlea->setNom(ucfirst($faker->word()))
-                        ->setNomScientifique(ucfirst($faker->word()) . ' ' . $faker->word())
-                        ->setFonction($faker->randomElement(['Conservateur', 'Solvant', 'Parfum']));
+            $produitAlea->setNom(substr(ucfirst($faker->word()), 0, 50))
+                        ->setNomScientifique(substr(ucfirst($faker->word()) . ' ' . $faker->word(), 0, 50))
+                        ->setFonction(substr($faker->randomElement(['Conservateur', 'Solvant', 'Parfum']), 0, 50));
             if (method_exists($produitAlea, 'setCategorie')) {
                 $produitAlea->setCategorie($catCosmetique);
             }
@@ -126,48 +118,35 @@ for ($i = 0; $i < 5; $i++) {
         }
 
         // --- 5. COMMANDE ---
-       // On boucle pour créer 15 commandes
-for ($i = 0; $i < 15; $i++) {
-    $commande = new Commande();
-    
-    // Génération de données aléatoires réalistes
-             $commande->setDateCommande($faker->dateTimeBetween('-2 months', '+1 month'))
-             ->setPrix($faker->randomFloat(2, 50, 3000)) // Prix entre 50.00 et 3000.00
-             ->setDelaiMin($faker->numberBetween(1, 3))
-             ->setDelaiMax($faker->numberBetween(4, 15))
-             ->setFournisseur($faker->randomElement($fournisseursReferences))
-             // On met plus de "En attente" pour que tu aies de quoi tester ta réception sur Angular
-             ->setStatut($faker->randomElement(['En attente', 'En attente', 'En attente', 'Reçue', 'Annulée'])); 
-    
-    $manager->persist($commande);
+        for ($i = 0; $i < 15; $i++) {
+            $commande = new Commande();
+            $commande->setDateCommande($faker->dateTimeBetween('-2 months', '+1 month'))
+                     ->setPrix($faker->randomFloat(2, 50, 3000))
+                     ->setDelaiMin($faker->numberBetween(1, 3))
+                     ->setDelaiMax($faker->numberBetween(4, 15))
+                     ->setFournisseur($faker->randomElement($fournisseursReferences))
+                     ->setStatut($faker->randomElement(['En attente', 'En attente', 'En attente', 'Reçue', 'Annulée'])); 
+            
+            $manager->persist($commande);
 
-    // On va ajouter entre 1 et 4 produits aléatoires à cette commande
-    $nombreProduits = $faker->numberBetween(1, 4);
-    
-    // On copie et on mélange ton tableau de références pour piocher au hasard sans avoir de doublons
-    $produitsMelanges = $produitsReferences;
-    shuffle($produitsMelanges);
+            $nombreProduits = $faker->numberBetween(1, 4);
+            $produitsMelanges = $produitsReferences;
+            shuffle($produitsMelanges);
 
-for ($j = 0; $j < $nombreProduits; $j++) {
-        // On stocke la quantité dans une variable pour s'en servir pour le calcul du poids
-        $quantiteAchetee = $faker->numberBetween(5, 100);
-        
-        // On invente un faux poids unitaire pour le test (ex: entre 0.5kg et 5kg l'unité)
-        $fauxPoidsUnitaire = $faker->randomFloat(2, 0.5, 5.0); 
-        
-        // Le poids total attendu = quantité * poids unitaire
-        $poidsTotalAttendu = $quantiteAchetee * $fauxPoidsUnitaire;
+            for ($j = 0; $j < $nombreProduits; $j++) {
+                $quantiteAchetee = $faker->numberBetween(5, 100);
+                $fauxPoidsUnitaire = $faker->randomFloat(2, 0.5, 5.0); 
+                $poidsTotalAttendu = $quantiteAchetee * $fauxPoidsUnitaire;
 
-        $contenir = new Contenir();
-        $contenir->setCommande($commande)
-                 ->setProduit($produitsMelanges[$j]) 
-                 ->setQuantite($quantiteAchetee)
-                 // 👈 AJOUT : On enregistre le poids attendu en format "string" pour le type Decimal
-                 ->setPoidsAttendu(number_format($poidsTotalAttendu, 2, '.', '')); 
-        
-        $manager->persist($contenir);
-    }
-}
+                $contenir = new Contenir();
+                $contenir->setCommande($commande)
+                         ->setProduit($produitsMelanges[$j]) 
+                         ->setQuantite($quantiteAchetee)
+                         ->setPoidsAttendu(number_format($poidsTotalAttendu, 2, '.', '')); 
+                
+                $manager->persist($contenir);
+            }
+        }
 
         // --- 7. INVENTAIRE ---
         $inventaire = new Inventaire();
@@ -175,11 +154,11 @@ for ($j = 0; $j < $nombreProduits; $j++) {
         $manager->persist($inventaire);
 
         foreach ($lotsReferences as $lot) {
-            $verifier = new VerifierLot(); 
-            $verifier->setInventaire($inventaire)
-                     ->setLot($lot)
-                     ->setQuantite($lot->getQuantite() - 1);
-            $manager->persist($verifier);
+            $ligne = new LigneInventaire(); 
+            $ligne->setInventaire($inventaire)
+                  ->setNomProduit(substr($lot->getProduit()->getNom(), 0, 255)) // Coupe par sécurité (même si LigneInventaire accepte 255)
+                  ->setQuantite($lot->getQuantite() - 1);
+            $manager->persist($ligne);
         }
 
         // --- 8. REÇU ---
