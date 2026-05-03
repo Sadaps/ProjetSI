@@ -133,7 +133,6 @@ export class Historique implements OnInit {
     }
   }
 
-  // --- NOUVELLE FONCTION POUR CALCULER LE TOTAL DE LA LIGNE ---
   calculerTotalLigne(ligne: any, idFournisseur: string): number {
     const quantite = parseFloat(ligne.quantite);
     const prixUnitaire = this.getPrixUnitaire(ligne, idFournisseur);
@@ -144,6 +143,33 @@ export class Historique implements OnInit {
       return (quantite / 1000) * prixUnitaire;
     } else {
       return quantite * prixUnitaire;
+    }
+  }
+
+  annulerCommande(commande: any) {
+    // 1. On demande confirmation à l'utilisateur
+    const confirmation = window.confirm(`Êtes-vous sûr de vouloir annuler la commande #${commande.id} ? Cette action est irréversible.`);
+    
+    // 2. S'il clique sur "OK", on lance l'annulation
+    if (confirmation) {
+      this.commandeService.changerStatutCommande(commande.id, 'Annulée').subscribe({
+        next: () => {
+          // On met à jour visuellement le statut pour que l'interface réagisse tout de suite
+          commande.statut = 'Annulée';
+          
+          alert('✅ La commande a été annulée avec succès.');
+          
+          // On ferme la fenêtre de détails
+          this.fermerDetail();
+          
+          // On rafraîchit la liste pour que la commande passe dans le bon filtre
+          this.appliquerFiltres();
+        },
+        error: (err) => {
+          console.error("Erreur lors de l'annulation :", err);
+          alert("Aïe, une erreur est survenue lors de l'annulation de la commande. Vérifiez la console.");
+        }
+      });
     }
   }
 }

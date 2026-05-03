@@ -48,7 +48,7 @@ export class Reception implements OnInit {
     this.commandeService.getCommandes().subscribe({
       next: (reponseApi) => {
         const toutesLesCommandes = reponseApi.member || reponseApi['hydra:member'] || [];
-        this.commandesEnAttente = toutesLesCommandes.filter((cmd: any) => cmd.statut !== 'Reçue');
+        this.commandesEnAttente = toutesLesCommandes.filter((cmd: any) => cmd.statut !== 'Reçue' && cmd.statut !== 'Annulée');
         this.isLoading = false; 
         this.cdr.detectChanges();
       },

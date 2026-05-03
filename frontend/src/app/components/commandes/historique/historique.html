@@ -108,5 +108,11 @@
         </tr>
       </tfoot>
     </table>
+
+    <div class="detail-actions" *ngIf="commandeSelectionnee.statut === 'En attente'" style="margin-top: 20px; display: flex; justify-content: flex-end;">
+      <button class="btn-danger" style="padding: 10px 20px; font-weight: bold;" (click)="annulerCommande(commandeSelectionnee)">
+        ❌ Annuler cette commande
+      </button>
+    </div>
   </div>
 </div>
