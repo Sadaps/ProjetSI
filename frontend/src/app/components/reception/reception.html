@@ -39,7 +39,7 @@
 <div class="cmd-details-box" *ngIf="selectedCommande">
   <div>
     <small>Fournisseur</small>
-    <strong [innerHTML]="selectedCommande?.fournisseur?.nom | highlight:motTape"></strong>
+    <strong>{{ selectedCommande?.fournisseur?.nom }}</strong>
   </div>
   <div>
     <small>Date de commande</small>
@@ -61,9 +61,9 @@
   
   <div *ngFor="let ligne of lignesLots; let i = index" class="lot-row">
     <div class="lot-info-produit">
-      <strong [innerHTML]="ligne.nomProduit | highlight:motTape"></strong>
-      <small [innerHTML]="ligne.nomScientifique | highlight:motTape"></small>
-      
+      <strong>{{ ligne.nomProduit }}</strong>
+      <small>{{ ligne.nomScientifique }}</small>
+
       <!-- 👇 Le fameux badge mis à jour avec notre formateur dynamique ! -->
       <span class="badge">Prévu : {{ afficherQuantiteFormatee(ligne.quantitePrevue, ligne.unite) }}</span>
     </div>

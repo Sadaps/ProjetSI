@@ -1,0 +1,159 @@
+/* =========================================
+   STYLE GLOBAL DU COMPOSANT INVENTAIRES
+   ========================================= */
+
+.inventaires-container {
+  animation: fadeIn 0.3s ease;
+  color: #2b3674;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header-actions h2 {
+  color: #2b3674;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* =========================================
+   BOUTONS (Rappel si encapsulation Angular)
+   ========================================= */
+
+.btn-secondary {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #f4f7fe;
+  color: #4318ff;
+}
+
+.btn-secondary:hover {
+  background-color: #e2e8f0;
+  color: #2b3674;
+  transform: translateY(-2px);
+}
+
+/* =========================================
+   MESSAGES DE CHARGEMENT ET VIDE
+   ========================================= */
+
+.loading, .no-data {
+  text-align: center;
+  padding: 40px;
+  color: #a3aed1;
+  font-weight: 500;
+  font-size: 16px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  border: 1px solid #e0e5f2;
+}
+
+/* =========================================
+   CARTES D'INVENTAIRE
+   ========================================= */
+
+.inventaire-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 25px 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  border: 1px solid #e0e5f2;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inventaire-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+.inventaire-card h3 {
+  color: #4318ff; /* Titre de l'inventaire en bleu principal */
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.inventaire-card p {
+  color: #a3aed1;
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.inventaire-card p strong {
+  color: #2b3674;
+  font-weight: 600;
+}
+
+/* =========================================
+   TABLEAU DES LIGNES D'INVENTAIRE
+   ========================================= */
+
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e0e5f2;
+  margin-top: 15px;
+}
+
+.stock-table thead {
+  background-color: #f4f7fe;
+}
+
+.stock-table th {
+  text-align: left;
+  padding: 14px 20px;
+  color: #a3aed1;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e0e5f2;
+}
+
+.stock-table td {
+  padding: 14px 20px;
+  color: #2b3674;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid #f0f3fa;
+}
+
+.stock-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.stock-table tbody tr:hover {
+  background-color: #f8f9fc;
+}
+
+/* Enlever la bordure du bas pour la dernière ligne du tableau */
+.stock-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Animation d'apparition */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

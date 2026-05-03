@@ -58,14 +58,22 @@ class Produit
     #[ORM\OneToMany(targetEntity: Contenir::class, mappedBy: 'produit')]
     private Collection $contenir;
 
-#[ORM\Column(type: 'float', options: ['default' => 0])]    
-#[Groups(['produit:read', 'contenir:read', 'commande:read'])]
+    #[ORM\Column(type: 'float', options: ['default' => 0])]    
+    #[Groups(['produit:read', 'contenir:read', 'commande:read'])]
     private ?float $quantiteTotale = 0;
 
     #[ORM\Column(length: 20, nullable: true)]
     #[Groups(['produit:read', 'contenir:read', 'commande:read'])]
     private ?string $unite = null;
 
+    #[ORM\Column(type: 'float', options: ['default' => 0])]    
+    #[Groups(['produit:read', 'contenir:read', 'commande:read'])]
+    private ?float $seuil = 0;
+
+    #[ORM\ManyToOne(targetEntity: Categorie::class, inversedBy: 'produits')]
+    #[ORM\JoinColumn(nullable: true)] 
+    #[Groups(['produit:read', 'contenir:read', 'commande:read'])]
+    private ?Categorie $categorie = null;
 
     public function __construct()
     {
@@ -77,6 +85,18 @@ class Produit
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getSeuil(): ?float
+    {
+        return $this->seuil;
+    }
+
+    public function setSeuil(float $seuil): static
+    {
+        $this->seuil = $seuil;
+
+        return $this;
     }
 
     public function getNom(): ?string
@@ -237,6 +257,18 @@ class Produit
     public function setUnite(?string $unite): static
     {
         $this->unite = $unite;
+
+        return $this;
+    }
+
+    public function getCategorie(): ?Categorie
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?Categorie $categorie): static
+    {
+        $this->categorie = $categorie;
 
         return $this;
     }

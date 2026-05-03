@@ -3,15 +3,13 @@ import { CommonModule } from '@angular/common'; // Toujours utile d'avoir le Com
 import { ProduitService } from '../../services/produit'; 
 import { Produit } from '../../models/produits.models';
 
-// 1. IMPORTS POUR LA RECHERCHE
-import { SearchService } from '../../search'; // Vérifie le chemin
-import { HighlightPipe } from '../../highlight-pipe'; // Vérifie le chemin
+
 
 @Component({
   selector: 'app-tableaubord',
   standalone: true, // Je te rajoute standalone: true par sécurité comme tes autres composants
   // 2. AJOUT DU COMMONMODULE ET DU HIGHLIGHTPIPE
-  imports: [CommonModule, HighlightPipe],
+  imports: [CommonModule],
   templateUrl: './tableaubord.html',
   styleUrl: './tableaubord.css',
 })
@@ -24,7 +22,6 @@ export class Tableaubord implements OnInit {
   constructor(
     private produitService: ProduitService,
     private cdr: ChangeDetectorRef,
-    private searchService: SearchService // <-- 4. Injection du service de recherche
   ) {}
 
  ngOnInit(): void {
@@ -41,11 +38,5 @@ export class Tableaubord implements OnInit {
       }
     });
 
-    // B. ÉCOUTE DE LA BARRE DE RECHERCHE
-    this.searchService.currentSearch.subscribe(valeur => {
-      this.motTape = valeur;
-      this.cdr.markForCheck(); 
-      this.cdr.detectChanges(); 
-    });
   }
 }

@@ -2,11 +2,10 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-
 @Component({
   selector: 'app-fournisseurs',
   standalone: true,
-  imports: [CommonModule, FormsModule], // AJOUT du HighlightPipe ici
+  imports: [CommonModule, FormsModule], 
   templateUrl: './fournisseurs.html',
   styleUrl: './fournisseurs.css',
 })

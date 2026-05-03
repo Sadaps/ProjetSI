@@ -6,22 +6,22 @@
   <div class="stats-grid">
     <div class="card blue">
       <!-- On met le texte fixe entre ' ' pour qu'il passe dans le pipe -->
-      <small [innerHTML]="'Total Produits' | highlight:motTape"></small>
+      <small >Total Produits</small>
       <div class="value">{{ produits.length }}</div>
     </div>
     
     <div class="card orange">
-      <small [innerHTML]="'Stocks Bas' | highlight:motTape"></small>
+      <small >Stocks Bas</small>
       <div class="value">3</div>
     </div>
     
     <div class="card yellow">
-      <small [innerHTML]="'Péremptions Proches' | highlight:motTape"></small>
+      <small >Péremptions Proches</small>
       <div class="value">2</div>
     </div>
     
     <div class="card red">
-      <small [innerHTML]="'Lots Périmés' | highlight:motTape"></small>
+      <small >Lots Périmés</small>
       <div class="value">0</div>
     </div>
   </div>

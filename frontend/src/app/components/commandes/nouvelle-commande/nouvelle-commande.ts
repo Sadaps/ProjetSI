@@ -60,13 +60,13 @@ export class NouvelleCommande implements OnInit {
           let total = 0;
           if (p.lots && Array.isArray(p.lots) && p.lots.length > 0 && typeof p.lots[0] !== 'string') {
             p.lots.forEach((lot: any) => {
-              total += +(lot.quantite || 0);
+              total += +(lot.contenanceRestante || 0);
             });
           }
           return { ...p, quantiteTotale: total };
         });
 
-        this.produitsEnAlerte = this.produits.filter(p => p.quantiteTotale < this.seuilAlerte);
+        this.produitsEnAlerte = this.produits.filter(p => p.quantiteTotale < p.seuil);
         this.isLoading = false;
         this.cdr.detectChanges();
       },

@@ -1,11 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http'; // <-- AJOUT de HttpClient et HttpHeaders
 import { CommandeService } from '../../services/commande'; 
 import { forkJoin, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
-import { SearchService } from '../../search'; 
-import { HighlightPipe } from '../../highlight-pipe'; 
 
 interface LigneReception {
   produitIri: string;
@@ -21,7 +20,7 @@ interface LigneReception {
 @Component({
   selector: 'app-reception',
   standalone: true,
-  imports: [CommonModule, FormsModule, HighlightPipe],
+  imports: [CommonModule, FormsModule],
   templateUrl: './reception.html',
   styleUrl: './reception.css'
 })
@@ -40,8 +39,8 @@ export class Reception implements OnInit {
   constructor(
     private commandeService: CommandeService, 
     private router: Router,
-    private searchService: SearchService,
-    private cdr: ChangeDetectorRef 
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient // <-- AJOUT de l'injection HttpClient
   ) {}
 
   ngOnInit() {
@@ -58,11 +57,6 @@ export class Reception implements OnInit {
       }
     });
 
-    this.searchService.currentSearch.subscribe(valeur => {
-      this.motTape = valeur;
-      this.cdr.markForCheck(); 
-      this.cdr.detectChanges(); 
-    });
   }
 
   // --- NOUVELLE FONCTION MAGIQUE D'AFFICHAGE ---
@@ -121,8 +115,8 @@ export class Reception implements OnInit {
       };
 
       return this.commandeService.creerLot(nouveauLot).pipe(
+        // 2. Création du reçu (historique de la transaction)
         switchMap((lotCree: any) => {
-          // 2. Création du reçu (historique de la transaction)
           const nouveauRecu = {
             commande: `/api/commandes/${this.selectedCommande.id}`,
             lot: lotCree['@id'], 
@@ -131,6 +125,22 @@ export class Reception implements OnInit {
             notes: this.notes
           };
           return this.commandeService.creerRecu(nouveauRecu);
+        }),
+        // 3. Récupérer le produit pour avoir sa quantité actuelle
+        switchMap(() => {
+          return this.http.get<any>(`http://127.0.0.1:8000${ligne.produitIri}`);
+        }),
+        // 4. Mettre à jour la quantité totale du produit
+        switchMap((produitEnBase: any) => {
+          const nouvelleQuantite = (produitEnBase.quantiteTotale || 0) + ligne.quantiteRecue;
+          
+          const httpOptionsPatch = {
+            headers: new HttpHeaders({ 'Content-Type': 'application/merge-patch+json' })
+          };
+
+          return this.http.patch(`http://127.0.0.1:8000${ligne.produitIri}`, {
+            quantiteTotale: nouvelleQuantite
+          }, httpOptionsPatch);
         })
       );
     });
@@ -139,12 +149,12 @@ export class Reception implements OnInit {
       next: () => {
         this.commandeService.changerStatutCommande(this.selectedCommande.id, 'Reçue').subscribe({
           next: () => {
-            alert('🎉 Réception validée et commande clôturée !');
+            alert('🎉 Réception validée, lots créés et stock mis à jour !');
             this.router.navigate(['/stocks']);
           },
           error: (err) => {
             console.error("Erreur lors du changement de statut", err);
-            alert("Lots créés, mais impossible de clôturer la commande.");
+            alert("Opérations réussies, mais impossible de clôturer la commande.");
             this.isSubmitting = false;
           }
         });
