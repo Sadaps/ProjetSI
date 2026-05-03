@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-fournisseurs',
   standalone: true,
-  imports: [CommonModule, FormsModule, HighlightPipe], // AJOUT du HighlightPipe ici
+  imports: [CommonModule, FormsModule], // AJOUT du HighlightPipe ici
   templateUrl: './fournisseurs.html',
   styleUrl: './fournisseurs.css',
 })
@@ -53,7 +53,6 @@ export class Fournisseurs implements OnInit {
   constructor(
     private http: HttpClient, 
     private cdr: ChangeDetectorRef,
-    private searchService: SearchService // Injection du service de recherche
   ) {}
 
   ngOnInit(): void {
