@@ -106,18 +106,18 @@ class AppFixtures extends Fixture
 
        // --- 3. PRODUITS + LOTS ---
         $vraisProduitsData = [
-            ['nom' => 'Huile d\'Amande Douce', 'sci' => 'Prunus Amygdalus Dulcis', 'fonc' => 'Émollient', 'unite' => 'ml', 'cat' => $catMatierePremiere],
-            ['nom' => 'Beurre de Karité', 'sci' => 'Butyrospermum Parkii', 'fonc' => 'Nourrissant', 'unite' => 'g', 'cat' => $catMatierePremiere],
-            ['nom' => 'Glycérine Végétale', 'sci' => 'Glycerin', 'fonc' => 'Humectant', 'unite' => 'ml', 'cat' => $catMatierePremiere],
-            ['nom' => 'Argile Verte', 'sci' => 'Montmorillonite', 'fonc' => 'Purifiant', 'unite' => 'g', 'cat' => $catMatierePremiere],
-            ['nom' => 'Charbon Actif', 'sci' => 'Activated Charcoal', 'fonc' => 'Détoxifiant', 'unite' => 'g', 'cat' => $catMatierePremiere],
-            ['nom' => 'Acide Hyaluronique', 'sci' => 'Sodium Hyaluronate', 'fonc' => 'Actif hydratant', 'unite' => 'g', 'cat' => $catMatierePremiere], 
-            ['nom' => 'Vitamine E', 'sci' => 'Tocopherol', 'fonc' => 'Antioxydant', 'unite' => 'ml', 'cat' => $catMatierePremiere],
+            ['nom' => 'Huile d\'Amande Douce', 'sci' => 'Prunus Amygdalus Dulcis', 'fonc' => 'Émollient', 'unite' => 'ml', 'cat' => $catMatierePremiere, 'seuil' => 500],
+            ['nom' => 'Beurre de Karité', 'sci' => 'Butyrospermum Parkii', 'fonc' => 'Nourrissant', 'unite' => 'g', 'cat' => $catMatierePremiere, 'seuil' => 1000],
+            ['nom' => 'Glycérine Végétale', 'sci' => 'Glycerin', 'fonc' => 'Humectant', 'unite' => 'ml', 'cat' => $catMatierePremiere, 'seuil' => 500],
+            ['nom' => 'Argile Verte', 'sci' => 'Montmorillonite', 'fonc' => 'Purifiant', 'unite' => 'g', 'cat' => $catMatierePremiere, 'seuil' => 2000],
+            ['nom' => 'Charbon Actif', 'sci' => 'Activated Charcoal', 'fonc' => 'Détoxifiant', 'unite' => 'g', 'cat' => $catMatierePremiere, 'seuil' => 500],
+            ['nom' => 'Acide Hyaluronique', 'sci' => 'Sodium Hyaluronate', 'fonc' => 'Actif hydratant', 'unite' => 'g', 'cat' => $catMatierePremiere, 'seuil' => 100], 
+            ['nom' => 'Vitamine E', 'sci' => 'Tocopherol', 'fonc' => 'Antioxydant', 'unite' => 'ml', 'cat' => $catMatierePremiere, 'seuil' => 50],
             //  Les emballages passent en Conditionnement
-            ['nom' => 'Flacons Verre 50ml', 'sci' => 'Pkg-V50', 'fonc' => 'Conditionnement', 'unite' => 'unité', 'cat' => $catConditionnement],
-            ['nom' => 'Bouchons Pompe', 'sci' => 'Pkg-BP', 'fonc' => 'Conditionnement', 'unite' => 'unité', 'cat' => $catConditionnement],
+            ['nom' => 'Flacons Verre 50ml', 'sci' => 'Pkg-V50', 'fonc' => 'Conditionnement', 'unite' => 'unité', 'cat' => $catConditionnement, 'seuil' => 100],
+            ['nom' => 'Bouchons Pompe', 'sci' => 'Pkg-BP', 'fonc' => 'Conditionnement', 'unite' => 'unité', 'cat' => $catConditionnement, 'seuil' => 100],
             //  Les produits finis ou intermédiaires restent en Cosmétique
-            ['nom' => 'Hydrolat de Rose', 'sci' => 'Rosa Damascena Water', 'fonc' => 'Apaisant', 'unite' => 'ml', 'cat' => $catCosmetique],
+            ['nom' => 'Hydrolat de Rose', 'sci' => 'Rosa Damascena Water', 'fonc' => 'Apaisant', 'unite' => 'ml', 'cat' => $catCosmetique, 'seuil' => 1000],
         ];
 
         $produitsReferences = [];
@@ -129,7 +129,8 @@ class AppFixtures extends Fixture
                     ->setNomScientifique($data['sci'])
                     ->setFonction($data['fonc'])
                     ->setCosmos('Certifié COSMOS Organic')
-                    ->setUnite($data['unite']); 
+                    ->setUnite($data['unite'])
+                    ->setSeuil((float)$data['seuil']);
             
             if (method_exists($produit, 'setCategorie')) {
                 // 👈 On utilise la catégorie définie dans le tableau !
@@ -221,16 +222,21 @@ class AppFixtures extends Fixture
         }
 
         // --- 5. INVENTAIRE ---
-        $inventaire = new Inventaire();
+       $inventaire = new Inventaire();
         $inventaire->setDateInv(new \DateTime());
         $manager->persist($inventaire);
 
-        foreach ($lotsReferences as $lot) {
-            $ligne = new LigneInventaire(); 
-            $ligne->setInventaire($inventaire)
-                  ->setNomProduit(substr($lot->getProduit()->getNom(), 0, 255)) 
-                  ->setQuantite((float)($lot->getContenanceRestante() - 1)); 
-            $manager->persist($ligne);
+        // 👈 ON BOUCLE SUR LES PRODUITS ET NON PLUS SUR LES LOTS
+        foreach ($produitsReferences as $produit) {
+            // On ne crée une ligne d'inventaire que si le produit a du stock
+            if ($produit->getQuantiteTotale() > 0) {
+                $ligne = new LigneInventaire(); 
+                $ligne->setInventaire($inventaire)
+                      ->setNomProduit(substr($produit->getNom(), 0, 255)) 
+                      // On prend la quantité totale du produit (et on fait un petit -1 pour simuler une perte si tu veux)
+                      ->setQuantite((float)($produit->getQuantiteTotale() - 1)); 
+                $manager->persist($ligne);
+            }
         }
 
         // --- 6. REÇU ---
