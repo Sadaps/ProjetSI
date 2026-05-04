@@ -40,7 +40,7 @@ export class Reception implements OnInit {
     private commandeService: CommandeService, 
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private http: HttpClient // <-- AJOUT de l'injection HttpClient
+    private http: HttpClient 
   ) {}
 
   ngOnInit() {

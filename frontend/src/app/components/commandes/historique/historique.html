@@ -97,7 +97,7 @@
             <span *ngIf="ligne.produit.unite === 'ml'">/L</span>
           </td>
           
-          <!-- 👇 Appel de la nouvelle fonction pour le calcul du total de la ligne 👇 -->
+          <!--  Appel de la nouvelle fonction pour le calcul du total de la ligne  -->
           <td>{{ calculerTotalLigne(ligne, commandeSelectionnee.fournisseur['@id']) | number:'1.2-2' }} €</td>
         </tr>
       </tbody>

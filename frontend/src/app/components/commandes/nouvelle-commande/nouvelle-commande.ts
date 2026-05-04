@@ -107,10 +107,10 @@ export class NouvelleCommande implements OnInit {
   ajouterLigneCommande() {
     this.lignesCommande.push({
       produitSelectionne: null,
-      quantiteAffichee: 1, // NOUVEAU : La quantité que l'utilisateur voit et tape (en kg/L)
+      quantiteAffichee: 1, //  La quantité que l'utilisateur voit et tape (en kg/L)
       prixUnitaire: 0, 
-      moqDb: 1,            // NOUVEAU : Le vrai MOQ de la base (en g/ml)
-      moqAffichee: 1       // NOUVEAU : Le MOQ converti pour l'utilisateur (en kg/L)
+      moqDb: 1,            //  Le vrai MOQ de la base (en g/ml)
+      moqAffichee: 1       // Le MOQ converti pour l'utilisateur (en kg/L)
     });
   }
 
@@ -155,7 +155,7 @@ export class NouvelleCommande implements OnInit {
       ligne.prixUnitaire = parseFloat(relationFournisseur.prix);
       ligne.moqDb = parseFloat(relationFournisseur.MOQ); 
       
-      // NOUVEAU : On convertit la MOQ pour l'affichage
+      // On convertit la MOQ pour l'affichage
       const unite = ligne.produitSelectionne.unite;
       if (unite === 'g' || unite === 'ml') {
         ligne.moqAffichee = ligne.moqDb / 1000;
@@ -170,7 +170,7 @@ export class NouvelleCommande implements OnInit {
 
   calculerPrixTotal(): number {
     return this.lignesCommande.reduce((total, ligne) => {
-      // NOUVEAU : On multiplie la quantité *affichée* (kg/L) par le prix (au kg/L) !
+      // On multiplie la quantité *affichée* (kg/L) par le prix (au kg/L) !
       return total + (ligne.quantiteAffichee * ligne.prixUnitaire);
     }, 0);
   }
@@ -178,7 +178,7 @@ export class NouvelleCommande implements OnInit {
   validerCommande() {
     this.isSubmitting = true;
 
-    // NOUVEAU : On vérifie avec la quantité affichée et le MOQ affiché
+    // On vérifie avec la quantité affichée et le MOQ affiché
     const lignesValides = this.lignesCommande.filter(ligne => ligne.produitSelectionne && ligne.quantiteAffichee >= ligne.moqAffichee);
 
     if (lignesValides.length !== this.lignesCommande.length) {
@@ -194,7 +194,7 @@ export class NouvelleCommande implements OnInit {
       prix: this.calculerPrixTotal().toFixed(2),
       
       contenir: lignesValides.map(ligne => {
-        // NOUVEAU : Le grand moment de la traduction inversée pour la Base de Données !
+        // Le moment de la traduction inversée pour la Base de Données !
         let quantiteFinale = ligne.quantiteAffichee;
         const unite = ligne.produitSelectionne.unite;
         

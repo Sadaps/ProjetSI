@@ -117,7 +117,7 @@ export class Historique implements OnInit {
     return fp ? parseFloat(fp.prix) : 0;
   }
 
-  // --- NOUVELLE FONCTION POUR AFFICHER LA QUANTITÉ AVEC LA BONNE UNITÉ ---
+  // --- FONCTION POUR AFFICHER LA QUANTITÉ AVEC LA BONNE UNITÉ ---
   afficherQuantiteFormatee(ligne: any): string {
     const quantite = parseFloat(ligne.quantite);
     const unite = ligne.produit?.unite; 

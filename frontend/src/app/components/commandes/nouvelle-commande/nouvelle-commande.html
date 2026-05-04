@@ -88,14 +88,14 @@
                 </option>
               </select>
               
-              <!-- NOUVEAU : Affichage intelligent des textes (kg, L ou Unités) -->
+              <!-- Affichage intelligent des textes (kg, L ou Unités) -->
               <small *ngIf="ligne.produitSelectionne" class="text-muted" style="display: block; margin-top: 4px;">
                 Quantité Min (MOQ) : {{ getAffichageMoq(ligne) }} | {{ getTextePrixUnitaire(ligne) }} : {{ ligne.prixUnitaire }} €
               </small>
             </div>
 
             <div class="champ-quantite">
-              <!-- NOUVEAU : On lie au moqAffichee, quantiteAffichee, et on autorise les virgules avec step -->
+              <!-- On lie au moqAffichee, quantiteAffichee, et on autorise les virgules avec step -->
               <input type="number" 
                      step="0.01" 
                      [(ngModel)]="ligne.quantiteAffichee" 
