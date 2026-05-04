@@ -64,7 +64,6 @@ class AppFixtures extends Fixture
 
         // --- 2. FOURNISSEURS ET CONTACTS AVEC FAKER ---
         $fournisseursReferences = []; 
-        // --- 2. FOURNISSEUR ---
 
         $fournisseur = new Fournisseur();
         $fournisseur->setNom('BioPlant France')->setTelephone('0102030405')->setAdresse('123 rue des Plantes')->setMail('info@bioplant.fr')->setPays('France')->setVille('Paris');
@@ -120,12 +119,6 @@ class AppFixtures extends Fixture
                     ->setCosmos('Certifié COSMOS Organic')
                     ->setUnite($data['unite']); 
             
-            if ($data['unite'] === 'g' || $data['unite'] === 'ml') {
-                $produit->setQuantiteTotale((float)$faker->randomElement([1000, 2500, 5000, 10000]));
-            } else {
-                $produit->setQuantiteTotale((float)$faker->numberBetween(50, 500));
-            }
-
             if (method_exists($produit, 'setCategorie')) {
                 $produit->setCategorie($catCosmetique);
             }
@@ -154,6 +147,8 @@ class AppFixtures extends Fixture
 
             // --- LOTS PAR PRODUIT ---
             $nbLots = $faker->numberBetween(1, 3);
+            $totalQuantiteProduit = 0; // 👈 On initialise le compteur pour CE produit
+
             for ($j = 0; $j < $nbLots; $j++) {
                 $lot = new Lots();
                 
@@ -171,7 +166,13 @@ class AppFixtures extends Fixture
                 
                 $manager->persist($lot);
                 $lotsReferences[] = $lot;
+
+                // 👈 On ajoute la quantité de ce lot au compteur global
+                $totalQuantiteProduit += $quantiteLot; 
             }
+
+            // 👈 MAINTENANT on attribue le vrai total calculé au produit !
+            $produit->setQuantiteTotale((float)$totalQuantiteProduit); 
         }
 
         // --- 4. 15 COMMANDES (Issues de ta branche) ---
@@ -206,7 +207,7 @@ class AppFixtures extends Fixture
             }
         }
 
-        // --- 5. INVENTAIRE (Issu de ton main) ---
+        // --- 5. INVENTAIRE ---
         $inventaire = new Inventaire();
         $inventaire->setDateInv(new \DateTime());
         $manager->persist($inventaire);
@@ -237,13 +238,13 @@ class AppFixtures extends Fixture
               ->setNomScientifique("Argania Spinosa")
               ->setFonction("Réparateur")
               ->setUnite("unités")
-              ->setSeuil(10) // Seuil à 10
-              ->setQuantiteTotale(8); // Total affiché
+              ->setSeuil(10) 
+              ->setQuantiteTotale(8); // Le total correspond déjà au seul lot en dessous, donc c'est ok !
         $manager->persist($argan);
 
         $lotArgan = new Lots();
         $lotArgan->setNumeroLot("ARG-2024-089")
-                 ->setContenanceRestante(8.0) // 8 < 10 => Alerte !
+                 ->setContenanceRestante(8.0) 
                  ->setDatePeremption($faker->dateTimeBetween('+1 year', '+2 years'))
                  ->setProduit($argan)
                  ->setDateEntreeLot(new \DateTime());
@@ -255,14 +256,14 @@ class AppFixtures extends Fixture
               ->setNomScientifique("Aloe Barbadensis")
               ->setFonction("Hydratant")
               ->setUnite("unités")
-              ->setSeuil(15) // Seuil à 15
-              ->setQuantiteTotale(5);
+              ->setSeuil(15)
+              ->setQuantiteTotale(5); // Pareil, le total correspond déjà !
         $manager->persist($aloe);
 
         $lotAloe = new Lots();
         $lotAloe->setNumeroLot("ALO-2024-198")
-                ->setContenanceRestante(5.0) // 5 < 15 => Alerte !
-                ->setDatePeremption($faker->dateTimeBetween('+5 days', '+10 days')) // Pour plus tard ;)
+                ->setContenanceRestante(5.0) 
+                ->setDatePeremption($faker->dateTimeBetween('+5 days', '+10 days')) 
                 ->setProduit($aloe)
                 ->setDateEntreeLot(new \DateTime());
         $manager->persist($lotAloe);
