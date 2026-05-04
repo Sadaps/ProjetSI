@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router'; 
 import { forkJoin } from 'rxjs'; 
-import { FormsModule } from '@angular/forms'; // <-- 1. AJOUT POUR LE [(ngModel)]
+import { FormsModule } from '@angular/forms'; 
 
 import { ProduitService } from '../../services/produit'; 
 import { Produit } from '../../models/produits.models';
@@ -12,13 +12,18 @@ import { Produit } from '../../models/produits.models';
 @Component({
   selector: 'app-stocks',
   standalone: true, 
-  // 2. AJOUT DU FORMSMODULE ICI
   imports: [CommonModule, FormsModule],
   templateUrl: './stocks.html',
   styleUrl: './stocks.css',
 })
 export class Stocks implements OnInit {
-  produits: any[] = []; 
+  produits: any[] = []; // Notre base de données "brute"
+  produitsAffiches: any[] = []; // Les produits réellement affichés (après filtre)
+  
+  // --- NOUVEAU : VARIABLES POUR LE FILTRE CATEGORIE ---
+  categories: any[] = [];
+  categorieSelectionnee: string = ''; 
+
   motTape: string = '';
 
   constructor(
@@ -28,25 +33,34 @@ export class Stocks implements OnInit {
     private router: Router 
   ) {}
 
-    // --- VARIABLES POUR LE NOUVEAU PRODUIT ---
+  // --- VARIABLES POUR LE NOUVEAU PRODUIT ---
   afficherFormulaireProduit: boolean = false;
-  listeFournisseurs: any[] = []; // Contiendra la liste des fournisseurs de la BDD
+  listeFournisseurs: any[] = []; 
   
-  // Modèle vierge
   nouveauProduit: any = {
     nom: '',
     nomScientifique: '',
     fonction: '',
     cosmos: '',
-    seuil: 0, // <-- AJOUT DU SEUIL ICI
+    seuil: 0, 
     unite: 'g',
-    fournisseurs: []
+    fournisseurs: [],
+    categorie: ''
   };
 
   ngOnInit(): void {
-    this.produitService.getProduits().subscribe({
-      next: (data) => {
-        const rawData = data.member || data['hydra:member'] || []; 
+    // NOUVEAU : On charge les produits ET les catégories en même temps !
+    const requeteProduits = this.produitService.getProduits();
+    const requeteCategories = this.http.get<any>('http://127.0.0.1:8000/api/categories');
+
+    forkJoin([requeteProduits, requeteCategories]).subscribe({
+      next: ([dataProduits, dataCategories]) => {
+        
+        // 1. Récupération des catégories
+        this.categories = dataCategories['hydra:member'] || dataCategories.member || [];
+
+        // 2. Récupération et traitement des produits
+        const rawData = dataProduits.member || dataProduits['hydra:member'] || []; 
         
         this.produits = rawData.map((p: any) => {
           let total = 0;
@@ -67,26 +81,43 @@ export class Stocks implements OnInit {
           };
         });
 
+        // 3. Au démarrage, on affiche tout !
+        this.produitsAffiches = [...this.produits];
+
         this.cdr.detectChanges(); 
       },
       error: (err) => console.error('🚨 Erreur API :', err)
     });
+  }
 
+  // ==========================================
+  // NOUVELLE FONCTION : FILTRER PAR CATEGORIE
+  // ==========================================
+  filtrerParCategorie(): void {
+    if (!this.categorieSelectionnee || this.categorieSelectionnee === '') {
+      // Si "Toutes les catégories" est sélectionné
+      this.produitsAffiches = [...this.produits];
+    } else {
+      // Sinon on filtre !
+      this.produitsAffiches = this.produits.filter(p => {
+        if (!p.categorie) return false;
+        
+        // Selon si API Platform renvoie un objet ou une string IRI
+        const idCategorieProduit = typeof p.categorie === 'string' ? p.categorie : (p.categorie['@id'] || p.categorie.id);
+        
+        return idCategorieProduit === this.categorieSelectionnee;
+      });
+    }
+    this.cdr.detectChanges();
   }
 
   toggleLots(produit: any): void {
     produit.isExpanded = !produit.isExpanded;
   }
 
-  // ==========================================
-  // NOUVELLES FONCTIONS : AJOUT DE PRODUIT
-  // ==========================================
-
   AjouterProduit(): void {
-    // Affiche ou masque le formulaire
     this.afficherFormulaireProduit = !this.afficherFormulaireProduit;
 
-    // Si on ouvre le formulaire et qu'on n'a pas encore chargé les fournisseurs, on fait la requête
     if (this.afficherFormulaireProduit && this.listeFournisseurs.length === 0) {
       this.http.get<any>('http://127.0.0.1:8000/api/fournisseurs').subscribe({
         next: (res) => {
@@ -97,7 +128,6 @@ export class Stocks implements OnInit {
     }
   }
 
-  // Permet d'afficher "au kg", "au L" ou "à l'unité" selon l'unité choisie
   getPrixUniteLabel(): string {
     if (this.nouveauProduit.unite === 'g') return 'kg';
     if (this.nouveauProduit.unite === 'ml') return 'L';
@@ -117,22 +147,20 @@ export class Stocks implements OnInit {
       headers: new HttpHeaders({ 'Content-Type': 'application/ld+json' })
     };
 
-    // 1. On prépare l'objet Produit avec le seuil
     const payloadProduit = {
       nom: this.nouveauProduit.nom,
       nomScientifique: this.nouveauProduit.nomScientifique,
       fonction: this.nouveauProduit.fonction,
       cosmos: this.nouveauProduit.cosmos,
-      seuil: this.nouveauProduit.seuil != null ? Number(this.nouveauProduit.seuil) : 0, // <-- AJOUT DU SEUIL (converti en nombre pour Symfony)
+      seuil: this.nouveauProduit.seuil != null ? Number(this.nouveauProduit.seuil) : 0, 
       unite: this.nouveauProduit.unite,
-      quantiteTotale: 0 // Par défaut à la création
+      quantiteTotale: 0,
+      categorie: this.nouveauProduit.categorie ? this.nouveauProduit.categorie : undefined
     };
 
-    // 2. Requête POST pour créer le Produit
     this.http.post<any>('http://127.0.0.1:8000/api/produits', payloadProduit, httpOptions).subscribe({
       next: (produitCree) => {
         
-        // 3. Préparer les requêtes pour lier les fournisseurs
         const requetesFournisseurs = this.nouveauProduit.fournisseurs
           .filter((f: any) => f.fournisseurId !== '')
           .map((f: any) => {
@@ -165,27 +193,25 @@ export class Stocks implements OnInit {
   finaliserAjout(nouveauProduitAPI: any): void {
     alert('✅ Produit ajouté avec succès !');
     
-    // On l'ajoute visuellement au tableau
+    // On l'ajoute dans la liste globale
     this.produits.push({
       ...nouveauProduitAPI,
       lots: [],
       isExpanded: false
     });
+    
+    // On met à jour l'affichage en repassant par le filtre actuel
+    this.filtrerParCategorie();
 
-    // On réinitialise le formulaire (avec le seuil à 0)
-    this.nouveauProduit = { nom: '', nomScientifique: '', fonction: '', cosmos: '', seuil: 0, unite: 'g', fournisseurs: [] };
+    this.nouveauProduit = { nom: '', nomScientifique: '', fonction: '', cosmos: '', seuil: 0, unite: 'g', fournisseurs: [] , categorie: ''};
     this.afficherFormulaireProduit = false;
     this.cdr.detectChanges();
   }
 
-  // ==========================================
-  // NOUVELLES FONCTIONS POUR LE RETRAIT DE LOTS
-  // ==========================================
-
   activerModeRetrait(lot: any, event: Event): void {
-    event.stopPropagation(); // Évite de replier la ligne parente
+    event.stopPropagation(); 
     lot.isRetraitMode = true;
-    lot.qteARetirer = null; // Prépare l'input à vide
+    lot.qteARetirer = null; 
   }
 
   annulerRetrait(lot: any, event: Event): void {
@@ -208,60 +234,43 @@ export class Stocks implements OnInit {
         })
       };
 
-      // 1. Requête pour le Produit (mise à jour du total)
       const updateProduit$ = this.http.patch(`http://127.0.0.1:8000/api/produits/${produit.id}`, {
         quantiteTotale: nouvelleQteProduit
       }, httpOptionsPatch);
 
-      // 2. Définition de l'action pour le Lot (DELETE ou PATCH)
       let actionLot$;
 
       if (nouvelleQteLot === 0) {
-        // Si la quantité tombe à 0, on prépare une requête de suppression
         actionLot$ = this.http.delete(`http://127.0.0.1:8000/api/lots/${lot.id}`);
       } else {
-        // Sinon, on prépare une simple mise à jour partielle
         actionLot$ = this.http.patch(`http://127.0.0.1:8000/api/lots/${lot.id}`, {
           contenanceRestante: nouvelleQteLot
         }, httpOptionsPatch);
       }
 
-      // 3. On lance les deux requêtes en parallèle
       forkJoin([actionLot$, updateProduit$]).subscribe({
         next: () => {
-          // Succès ! Mise à jour de l'affichage front-end
-          
           if (nouvelleQteLot === 0) {
-            // On supprime le lot du tableau visuel
             produit.lots = produit.lots.filter((l: any) => l.id !== lot.id);
           } else {
-            // On met à jour la quantité visuelle et on ferme l'input
             lot.contenanceRestante = nouvelleQteLot;
             lot.isRetraitMode = false;
             lot.qteARetirer = null;
           }
 
-          // Mise à jour du total du produit parent
           if (produit.quantiteTotale !== undefined) {
             produit.quantiteTotale = nouvelleQteProduit;
           }
 
-          // Rafraîchir la vue Angular
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error("🚨 Erreur lors de la sauvegarde en base de données :", err);
-          alert("Une erreur est survenue lors de la modification du stock. Veuillez réessayer.");
+          console.error("🚨 Erreur lors de la sauvegarde :", err);
+          alert("Une erreur est survenue. Veuillez réessayer.");
         }
       });
     }
   }
-
-
-
-  // ==========================================
-  // FONCTIONS POUR L'INVENTAIRE (Existantes)
-  // ==========================================
 
   consulterInventaires(): void {
     this.router.navigate(['/inventaires']); 

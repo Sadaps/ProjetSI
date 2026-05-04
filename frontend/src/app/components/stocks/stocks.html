@@ -1,12 +1,26 @@
 <div class="stocks-container">
   <h2>Gestion des Stocks</h2>
 
+  <!-- Message de chargement -->
   <div *ngIf="produits.length === 0" class="loading">
     <p>⏳ Chargement des produits en cours...</p>
   </div>
 
   <div class="stocks-container">
-  <div class="header-actions" style="display: flex; justify-content: space-between; align-items: center;">
+  
+  <!-- NOUVEAU : EN-TÊTE AVEC LE FILTRE -->
+  <div class="header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    
+    <!-- Filtre Catégorie à gauche -->
+    <div class="filtre-categorie" style="display: flex; align-items: center; gap: 10px;" *ngIf="produits.length > 0">
+      <label style="font-weight: bold; color: #4338ca;">Catégorie :</label>
+      <select [(ngModel)]="categorieSelectionnee" (change)="filtrerParCategorie()" class="form-control" style="width: auto; min-width: 200px;">
+        <option value="">Toutes les catégories</option>
+        <option *ngFor="let cat of categories" [value]="cat['@id'] || cat.id">{{ cat.nom }}</option>
+      </select>
+    </div>
+
+    <!-- Boutons Inventaire à droite -->
     <div class="buttons-group">
       <button (click)="consulterInventaires()" class="btn-secondary">Consulter les inventaires</button>
       <button (click)="creerNouvelInventaire()" class="btn-primary">Créer un nouvel inventaire</button>
@@ -26,32 +40,24 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let produit of produits">
+      <!-- NOUVEAU : On utilise la liste FILTRÉE (produitsAffiches) -->
+      <ng-container *ngFor="let produit of produitsAffiches">
         
         <tr (click)="toggleLots(produit)" class="produit-row" style="cursor: pointer;">
           <td>{{ produit.id }}</td>
-          
-
           <td><strong>{{ produit.nom }}</strong></td>
           <td>{{ produit.nomScientifique }}</td>
           <td>{{ produit.fonction}}</td>
           <td>{{ produit.cosmos}}</td>
-          
           <td>{{ produit.quantiteTotale || 0 }}{{ produit.unite }}</td>
-          
           <td>
-            <span *ngIf="(produit.quantiteTotale || 0) > 0" class="status-in">
-              ✅ En stock
-            </span>
-            <span *ngIf="(produit.quantiteTotale || 0) <= 0" class="status-out">
-              ❌ Hors stock
-            </span>
+            <span *ngIf="(produit.quantiteTotale || 0) > 0" class="status-in">✅ En stock</span>
+            <span *ngIf="(produit.quantiteTotale || 0) <= 0" class="status-out">❌ Hors stock</span>
           </td>
         </tr>
 
         <tr *ngIf="produit.isExpanded" class="lots-row">
           <td colspan="8" class="lots-cell">
-            
             <div *ngIf="produit.lots && produit.lots.length > 0; else noLots" class="inner-table-container">
               <table class="lots-table">
                 <thead>
@@ -65,52 +71,35 @@
                 </thead>
                 <tbody>
                   <tr *ngFor="let lot of produit.lots">
-                    <!-- SURLIGNAGE : ID du lot (optionnel, mais pratique si on cherche un lot spécifique) -->
                     <td><span>{{ lot.id }}</span></td>
-                    
                     <td>{{ lot.contenanceRestante }}{{produit.unite}}</td>
                     <td>{{ lot.dateEntreeLot | date:'dd/MM/yyyy' }}</td>
                     <td>{{ lot.datePeremption | date:'dd/MM/yyyy' }}</td>
-                   <td>
-  <!-- Bouton par défaut si on n'est pas en train de retirer une quantité -->
-  <button *ngIf="!lot.isRetraitMode" (click)="activerModeRetrait(lot, $event)" class="btn-secondary">
-    Retirer une quantité
-  </button>
+                    <td>
+                      <!-- Bouton par défaut si on n'est pas en train de retirer une quantité -->
+                      <button *ngIf="!lot.isRetraitMode" (click)="activerModeRetrait(lot, $event)" class="btn-secondary">
+                        Retirer une quantité
+                      </button>
 
-  <!-- Zone de saisie (s'affiche quand isRetraitMode est true) -->
-  <div *ngIf="lot.isRetraitMode" style="display: flex; gap: 5px; align-items: center;" (click)="$event.stopPropagation()">
-    <input 
-      type="number" 
-      [(ngModel)]="lot.qteARetirer" 
-      min="1" 
-      [max]="lot.contenanceRestante" 
-      style="width: 70px;"
-      class="form-control"
-    />
-    
-    <!-- Bouton Valider : Désactivé si la quantité est invalide -->
-    <button 
-      (click)="validerRetrait(lot, produit, $event)" 
-      [disabled]="!lot.qteARetirer || lot.qteARetirer <= 0 || lot.qteARetirer > lot.contenanceRestante"
-      class="btn-primary"
-      style="padding: 5px 10px;">
-      ✓ Valider
-    </button>
-    
-    <!-- Bouton Annuler -->
-    <button 
-      (click)="annulerRetrait(lot, $event)" 
-      class="btn-secondary"
-      style="padding: 5px 10px;">
-      ✗
-    </button>
-  </div>
+                      <!-- Zone de saisie (s'affiche quand isRetraitMode est true) -->
+                      <div *ngIf="lot.isRetraitMode" style="display: flex; gap: 5px; align-items: center;" (click)="$event.stopPropagation()">
+                        <input type="number" [(ngModel)]="lot.qteARetirer" min="1" [max]="lot.contenanceRestante" style="width: 70px;" class="form-control" />
+                        
+                        <button (click)="validerRetrait(lot, produit, $event)" 
+                                [disabled]="!lot.qteARetirer || lot.qteARetirer <= 0 || lot.qteARetirer > lot.contenanceRestante"
+                                class="btn-primary" style="padding: 5px 10px;">
+                          ✓ Valider
+                        </button>
+                        
+                        <button (click)="annulerRetrait(lot, $event)" class="btn-secondary" style="padding: 5px 10px;">
+                          ✗
+                        </button>
+                      </div>
 
-        <!-- Message d'alerte si la saisie dépasse le stock restant -->
-        <small *ngIf="lot.qteARetirer > lot.contenanceRestante" style="color: red; display: block; margin-top: 5px;">
-          La quantité maximale est de {{ lot.contenanceRestante }}
-        </small>
-      </td>
+                      <small *ngIf="lot.qteARetirer > lot.contenanceRestante" style="color: red; display: block; margin-top: 5px;">
+                        La quantité maximale est de {{ lot.contenanceRestante }}
+                      </small>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -126,13 +115,19 @@
       </ng-container>
     </tbody>
   </table>
-<button (click)="AjouterProduit()" class="btn-secondary">Ajouter un produit</button>
-   <!-- Formulaire d'ajout de produit (Visible uniquement si afficherFormulaireProduit est true) -->
-<div *ngIf="afficherFormulaireProduit" class="form-container" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
+
+  <!-- Message si la catégorie sélectionnée est vide -->
+  <div *ngIf="produitsAffiches.length === 0 && produits.length > 0" style="margin-top: 20px; text-align: center; color: #666;">
+    <p>Aucun produit ne correspond à cette catégorie.</p>
+  </div>
+
+<button (click)="AjouterProduit()" class="btn-secondary" style="margin-top: 20px;">Ajouter un produit</button>
+
+<!-- Formulaire d'ajout de produit -->
+<div *ngIf="afficherFormulaireProduit" class="form-container" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; margin-top: 20px; border: 1px solid #ddd;">
   <h3>Ajouter un nouveau produit</h3>
   
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-    <!-- Infos de base -->
     <div>
       <label>Nom du produit</label>
       <input type="text" [(ngModel)]="nouveauProduit.nom" class="form-control" placeholder="Ex: Acide Hyaluronique">
@@ -161,11 +156,18 @@
         <option value="unité">Unité</option>
       </select>
     </div>
+    <!-- NOUVEAU : Assignation rapide à une catégorie à la création (Bonus !) -->
+    <div style="grid-column: span 2;">
+      <label>Catégorie</label>
+      <select [(ngModel)]="nouveauProduit.categorie" class="form-control">
+        <option value="" disabled>Sélectionner une catégorie...</option>
+        <option *ngFor="let cat of categories" [value]="cat['@id'] || cat.id">{{ cat.nom }}</option>
+      </select>
+    </div>
   </div>
 
   <hr style="margin: 20px 0;">
 
-  <!-- Section Fournisseurs Dynamiques -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
     <h4>Fournisseurs associés</h4>
     <button (click)="ajouterFournisseur()" class="btn-secondary">+ Ajouter un fournisseur</button>
@@ -185,7 +187,6 @@
         <td>
           <select [(ngModel)]="f.fournisseurId" class="form-control">
             <option value="" disabled>Sélectionner...</option>
-            <!-- On boucle sur les fournisseurs de la BDD -->
             <option *ngFor="let dbFournisseur of listeFournisseurs" [value]="dbFournisseur['@id']">
               {{ dbFournisseur.nom }}
             </option>
@@ -204,7 +205,6 @@
     </tbody>
   </table>
 
-  <!-- Boutons de validation -->
   <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
     <button (click)="AjouterProduit()" class="btn-secondary">Annuler</button>
     <button (click)="sauvegarderNouveauProduit()" class="btn-primary" [disabled]="!nouveauProduit.nom">Enregistrer le produit</button>

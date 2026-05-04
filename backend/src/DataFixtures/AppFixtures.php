@@ -58,9 +58,19 @@ class AppFixtures extends Fixture
         $manager->persist($fonctionAutre);
 
 
+       // --- CATEGORIES ---
         $catCosmetique = new Categorie();
         $catCosmetique->setNom('Cosmétique')->setDenomination('C');
         $manager->persist($catCosmetique);
+
+        // 👈 NOUVELLES CATÉGORIES
+        $catMatierePremiere = new Categorie();
+        $catMatierePremiere->setNom('Matière Première')->setDenomination('MP');
+        $manager->persist($catMatierePremiere);
+
+        $catConditionnement = new Categorie();
+        $catConditionnement->setNom('Conditionnement')->setDenomination('PKG');
+        $manager->persist($catConditionnement);
 
         // --- 2. FOURNISSEURS ET CONTACTS AVEC FAKER ---
         $fournisseursReferences = []; 
@@ -94,18 +104,20 @@ class AppFixtures extends Fixture
             }
         }
 
-        // --- 3. PRODUITS + LOTS ---
+       // --- 3. PRODUITS + LOTS ---
         $vraisProduitsData = [
-            ['nom' => 'Huile d\'Amande Douce', 'sci' => 'Prunus Amygdalus Dulcis', 'fonc' => 'Émollient', 'unite' => 'ml'],
-            ['nom' => 'Beurre de Karité', 'sci' => 'Butyrospermum Parkii', 'fonc' => 'Nourrissant', 'unite' => 'g'],
-            ['nom' => 'Glycérine Végétale', 'sci' => 'Glycerin', 'fonc' => 'Humectant', 'unite' => 'ml'],
-            ['nom' => 'Argile Verte', 'sci' => 'Montmorillonite', 'fonc' => 'Purifiant', 'unite' => 'g'],
-            ['nom' => 'Charbon Actif', 'sci' => 'Activated Charcoal', 'fonc' => 'Détoxifiant', 'unite' => 'g'],
-            ['nom' => 'Acide Hyaluronique', 'sci' => 'Sodium Hyaluronate', 'fonc' => 'Actif hydratant', 'unite' => 'g'], 
-            ['nom' => 'Vitamine E', 'sci' => 'Tocopherol', 'fonc' => 'Antioxydant', 'unite' => 'ml'],
-            ['nom' => 'Flacons Verre 50ml', 'sci' => 'Pkg-V50', 'fonc' => 'Conditionnement', 'unite' => 'unité'],
-            ['nom' => 'Bouchons Pompe', 'sci' => 'Pkg-BP', 'fonc' => 'Conditionnement', 'unite' => 'unité'],
-            ['nom' => 'Hydrolat de Rose', 'sci' => 'Rosa Damascena Water', 'fonc' => 'Apaisant', 'unite' => 'ml'],
+            ['nom' => 'Huile d\'Amande Douce', 'sci' => 'Prunus Amygdalus Dulcis', 'fonc' => 'Émollient', 'unite' => 'ml', 'cat' => $catMatierePremiere],
+            ['nom' => 'Beurre de Karité', 'sci' => 'Butyrospermum Parkii', 'fonc' => 'Nourrissant', 'unite' => 'g', 'cat' => $catMatierePremiere],
+            ['nom' => 'Glycérine Végétale', 'sci' => 'Glycerin', 'fonc' => 'Humectant', 'unite' => 'ml', 'cat' => $catMatierePremiere],
+            ['nom' => 'Argile Verte', 'sci' => 'Montmorillonite', 'fonc' => 'Purifiant', 'unite' => 'g', 'cat' => $catMatierePremiere],
+            ['nom' => 'Charbon Actif', 'sci' => 'Activated Charcoal', 'fonc' => 'Détoxifiant', 'unite' => 'g', 'cat' => $catMatierePremiere],
+            ['nom' => 'Acide Hyaluronique', 'sci' => 'Sodium Hyaluronate', 'fonc' => 'Actif hydratant', 'unite' => 'g', 'cat' => $catMatierePremiere], 
+            ['nom' => 'Vitamine E', 'sci' => 'Tocopherol', 'fonc' => 'Antioxydant', 'unite' => 'ml', 'cat' => $catMatierePremiere],
+            //  Les emballages passent en Conditionnement
+            ['nom' => 'Flacons Verre 50ml', 'sci' => 'Pkg-V50', 'fonc' => 'Conditionnement', 'unite' => 'unité', 'cat' => $catConditionnement],
+            ['nom' => 'Bouchons Pompe', 'sci' => 'Pkg-BP', 'fonc' => 'Conditionnement', 'unite' => 'unité', 'cat' => $catConditionnement],
+            //  Les produits finis ou intermédiaires restent en Cosmétique
+            ['nom' => 'Hydrolat de Rose', 'sci' => 'Rosa Damascena Water', 'fonc' => 'Apaisant', 'unite' => 'ml', 'cat' => $catCosmetique],
         ];
 
         $produitsReferences = [];
@@ -120,7 +132,8 @@ class AppFixtures extends Fixture
                     ->setUnite($data['unite']); 
             
             if (method_exists($produit, 'setCategorie')) {
-                $produit->setCategorie($catCosmetique);
+                // 👈 On utilise la catégorie définie dans le tableau !
+                $produit->setCategorie($data['cat']); 
             }
 
             $manager->persist($produit);
@@ -240,6 +253,9 @@ class AppFixtures extends Fixture
               ->setUnite("unités")
               ->setSeuil(10) 
               ->setQuantiteTotale(8); // Le total correspond déjà au seul lot en dessous, donc c'est ok !
+              if (method_exists($argan, 'setCategorie')) {
+             $argan->setCategorie($catMatierePremiere); 
+        }
         $manager->persist($argan);
 
         $lotArgan = new Lots();
@@ -258,6 +274,9 @@ class AppFixtures extends Fixture
               ->setUnite("unités")
               ->setSeuil(15)
               ->setQuantiteTotale(5); // Pareil, le total correspond déjà !
+              if (method_exists($aloe, 'setCategorie')) {
+             $aloe->setCategorie($catMatierePremiere);
+        }
         $manager->persist($aloe);
 
         $lotAloe = new Lots();

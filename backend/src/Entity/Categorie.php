@@ -25,7 +25,7 @@ class Categorie
     #[Groups(['categorie:read', 'produit:read'])]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 1)]
+    #[ORM\Column(length: 10)]
     #[Groups(['categorie:read', 'produit:read'])]
     private ?string $denomination = null;
 
