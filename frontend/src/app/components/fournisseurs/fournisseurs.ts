@@ -69,7 +69,7 @@ export class Fournisseurs implements OnInit {
       this.cdr.detectChanges();
     });
   }
-
+  //confirmation de l'ajout d'un fournisseur ou de la modification d'un fournisseur, en fonction du contexte (ajout "this.nouveauFournisseur" ou modification "this.fournisseurEnCoursDeditionId")
   validerAjout() {
     if (this.isEditingFournisseur && this.fournisseurEnCoursDeditionId) {
       const headers = new HttpHeaders({ 'Content-Type': 'application/merge-patch+json' });
@@ -121,7 +121,7 @@ export class Fournisseurs implements OnInit {
     this.fournisseurEnCoursDeditionId = null;
     this.nouveauFournisseur = { nom: '', telephone: '', mail: '', adresse: '', codePostal: '', ville: '', pays: 'France' };
   }
-
+ // Fonctions pour charger toutes les fonctions (pour les contacts) pour les afficher et les lister dans le formulaire d'ajout/modification de contact
   chargerFonctions() {
     this.http.get<any>(`${this.apiUrl}/fonctions`).subscribe({
       next: (data) => {
@@ -132,6 +132,7 @@ export class Fournisseurs implements OnInit {
     });
   }
 
+  // Permet d'afficehr les details d'un fournisseur, notamment la liste de ses contacts et les informations associées
   voirDetails(id: number) {
     this.http.get<any>(`${this.apiUrl}/fournisseurs/${id}`).subscribe({
       next: (data) => {
@@ -199,6 +200,7 @@ export class Fournisseurs implements OnInit {
     });
   }
 
+  
   supprimerContact(contactId: number) {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce contact ?')) {
       this.http.delete(`${this.apiUrl}/contacts/${contactId}`).subscribe({

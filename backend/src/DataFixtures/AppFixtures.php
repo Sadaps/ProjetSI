@@ -229,6 +229,44 @@ class AppFixtures extends Fixture
             $manager->persist($recu);
         }
 
+        // --- 7. On ajoute 2 produit pour tester le tableau de bord (lot sous le seuil) ---
+        
+        // Produit 1 : Huile d'Argan (Alerte Stock)
+        $argan = new Produit();
+        $argan->setNom("Huile d'Argan")
+              ->setNomScientifique("Argania Spinosa")
+              ->setFonction("Réparateur")
+              ->setUnite("unités")
+              ->setSeuil(10) // Seuil à 10
+              ->setQuantiteTotale(8); // Total affiché
+        $manager->persist($argan);
+
+        $lotArgan = new Lots();
+        $lotArgan->setNumeroLot("ARG-2024-089")
+                 ->setContenanceRestante(8.0) // 8 < 10 => Alerte !
+                 ->setDatePeremption($faker->dateTimeBetween('+1 year', '+2 years'))
+                 ->setProduit($argan)
+                 ->setDateEntreeLot(new \DateTime());
+        $manager->persist($lotArgan);
+
+        // Produit 2 : Aloe Vera (Alerte Stock)
+        $aloe = new Produit();
+        $aloe->setNom("Aloe Vera")
+              ->setNomScientifique("Aloe Barbadensis")
+              ->setFonction("Hydratant")
+              ->setUnite("unités")
+              ->setSeuil(15) // Seuil à 15
+              ->setQuantiteTotale(5);
+        $manager->persist($aloe);
+
+        $lotAloe = new Lots();
+        $lotAloe->setNumeroLot("ALO-2024-198")
+                ->setContenanceRestante(5.0) // 5 < 15 => Alerte !
+                ->setDatePeremption($faker->dateTimeBetween('+5 days', '+10 days')) // Pour plus tard ;)
+                ->setProduit($aloe)
+                ->setDateEntreeLot(new \DateTime());
+        $manager->persist($lotAloe);
+
         $manager->flush();
     }
 }

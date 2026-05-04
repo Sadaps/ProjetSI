@@ -27,3 +27,48 @@
 .orange { border-top: 4px solid #f97316; color: #f97316; }
 .yellow { border-top: 4px solid #eab308; color: #eab308; }
 .red { border-top: 4px solid #ef4444; color: #ef4444; }
+.dashboard-body {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  border-radius: 12px;
+  transition: transform 0.2s;
+}
+
+.card .value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-top: 5px;
+}
+
+/* Bordures colorées comme sur l'image */
+.blue { border-top: 5px solid #0d6efd; }
+.orange { border-top: 5px solid #fd7e14; }
+.yellow { border-top: 5px solid #ffc107; }
+.red { border-top: 5px solid #dc3545; }
+
+.icon-box {
+  font-size: 1.2rem;
+}
+
+.list-group-item {
+  transition: background-color 0.2s;
+}
+
+.list-group-item:hover {
+  background-color: #fcfcfc;
+}
+
+/* Alignement parfait des petits textes */
+small {
+  font-size: 0.75rem;
+}
